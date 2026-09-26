@@ -239,23 +239,32 @@ public class ModListWidget extends AlwaysSelectedEntryListWidget<ModListEntry> i
 		if (this.isMouseOver(double_1, double_2))  {
 			ModListEntry entry = this.getEntryAtPos(double_1, double_2);
 			if (entry != null) {
-                if (entry.list.getFocused() != null) {
-                    if (!entry.list.getFocused().equals(entry)) {
-                        this.setFocused(entry);
-                        this.setSelected(entry);
-                        this.setDragging(true);
-                        super.mouseClicked(double_1, double_2, int_1);
-                    }
-                } else {
-                    this.setFocused(entry);
-                    this.setSelected(entry);
-                    this.setDragging(true);
-                    super.mouseClicked(double_1, double_2, int_1);
-                }
+				if (entry.list.getFocused() != null) {
+					if (!entry.list.getFocused().equals(entry)) {
+						this.setFocused(entry);
+						this.setSelected(entry);
+						this.setDragging(true);
+						super.mouseClicked(double_1, double_2, int_1);
+					}
+				} else {
+					this.setFocused(entry);
+					this.setSelected(entry);
+					this.setDragging(true);
+					super.mouseClicked(double_1, double_2, int_1);
+				}
 			} else if (int_1 == 0) {
 				this.clickedHeader((int) (double_1 - (double) (this.left + this.width / 2 - this.getRowWidth() / 2)), (int) (double_2 - (double) this.top) + (int) this.getScrollAmount() - 4);
 			}
 		}
+	}
+
+	@Override
+	public boolean mouseScrolled(double mouseX, double mouseY, double scrollDelta) {
+		if (this.isMouseOver(mouseX, mouseY)) {
+			setScrollAmount(getScrollAmount() - scrollDelta * 20.0);
+			return true;
+		}
+		return false;
 	}
 
 	public final ModListEntry getEntryAtPos(double x, double y) {
