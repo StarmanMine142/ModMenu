@@ -39,7 +39,7 @@ public abstract class EntryListWidget<E extends EntryListWidget.Entry<E>> extend
 	protected boolean renderSelection = true;
 	protected boolean renderHeader;
 	protected int headerHeight;
-	private boolean scrolling;
+	protected boolean scrolling;
 	private E selected;
 
 	private E focused;
@@ -168,7 +168,6 @@ public abstract class EntryListWidget<E extends EntryListWidget.Entry<E>> extend
 	}
 
 	public void render(int i, int j, float f) {
-		oldY = j;
 		this.renderBackground();
 		int k = this.getScrollbarPosition();
 		int l = k + 6;
@@ -321,25 +320,25 @@ public abstract class EntryListWidget<E extends EntryListWidget.Entry<E>> extend
 		return this.width / 2 + 124;
 	}
 
-    @Override
+	@Override
 	public void mouseClicked(int d, int e, int i) {
 		this.updateScrollingState(d, e, i);
 		if (this.isMouseOver(d, e))  {
 			E entry = this.getEntryAtPosition(d, e);
 			if (entry != null) {
-                if (entry.list.getFocused() != null) {
-                    if (!entry.list.getFocused().equals(entry)) {
-                        this.focused = entry;
-                        this.selected = entry;
-                        this.dragging = true;
-                        super.mouseClicked(d, e, i);
-                    }
-                } else {
-                    this.focused = entry;
-                    this.selected = entry;
-                    this.dragging = true;
-                    super.mouseClicked(d, e, i);
-                }
+				if (entry.list.getFocused() != null) {
+					if (!entry.list.getFocused().equals(entry)) {
+						this.focused = entry;
+						this.selected = entry;
+						this.dragging = true;
+						super.mouseClicked(d, e, i);
+					}
+				} else {
+					this.focused = entry;
+					this.selected = entry;
+					this.dragging = true;
+					super.mouseClicked(d, e, i);
+				}
 			} else if (i == 0) {
 				this.clickedHeader((int)(d - (double)(this.left + this.width / 2 - this.getRowWidth() / 2)), (int)(e - (double)this.top) + (int)this.getScrollAmount() - 4);
 			}
@@ -353,14 +352,12 @@ public abstract class EntryListWidget<E extends EntryListWidget.Entry<E>> extend
 		return false;
 	}
 
-	double oldY = -1;
 	public boolean mouseDragged(double mouseX, double mouseY, int mouseButton, double mouseDX, double mouseDY) {
-		if (mouseButton == 0 && isMouseOver(mouseX, mouseY)) {
-			setScrollAmount(getScrollAmount() - mouseY + oldY);
+		if (this.scrolling) {
+			setScrollAmount(getScrollAmount() - mouseDY);
 			return true;
-		} else {
-			return false;
 		}
+		return false;
 	}
 
 	public boolean mouseScrolled(double d, double e, double f) {
