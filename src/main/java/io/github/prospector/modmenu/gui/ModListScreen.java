@@ -253,9 +253,9 @@ public class ModListScreen extends Screen {
 	@Override
 	public void keyPressed(char char_1, int int_1, int mouseX, int mouseY) {
 		this.searchBox.textboxKeyTyped(char_1, int_1);
-        if (int_1 == 1) {
-            this.mc.displayScreen(this.parent);
-        }
+		if (int_1 == 1) {
+			this.mc.displayScreen(this.parent);
+		}
 		modList.keyPressed(int_1, 0, 0);
 		descriptionListWidget.keyPressed(int_1, 0, 0);
 	}
@@ -275,12 +275,23 @@ public class ModListScreen extends Screen {
 			descriptionListWidget.mouseReleased(mouseX, mouseY, mouseButton);
 		}
 	}
-	
+
 	@Override
 	public void render(int mouseX, int mouseY, float delta) {
 		I18n i18n = I18n.getInstance();
-		int mouseDX = Mouse.getEventDX() * this.width / this.mc.resolution.getScaledWidthScreenCoords(); // field_6326_c
-		int mouseDY = this.height - Mouse.getEventDY() * this.height / this.mc.resolution.getScaledHeightScreenCoords() - 1; // field_6325_d
+		
+		int dWheel = Mouse.getDWheel();
+		if (dWheel != 0) {
+			double scrollDelta = dWheel > 0 ? 1.0 : -1.0;
+			if (this.modList != null && this.modList.isMouseOver(mouseX, mouseY)) {
+				this.modList.mouseScrolled(mouseX, mouseY, scrollDelta);
+			} else if (this.descriptionListWidget != null && this.descriptionListWidget.isMouseOver(mouseX, mouseY)) {
+				this.descriptionListWidget.mouseScrolled(mouseX, mouseY, scrollDelta);
+			}
+		}
+
+		int mouseDX = Mouse.getDX() * this.width / this.mc.resolution.getScaledWidthScreenCoords(); // field_6326_c
+		int mouseDY = Mouse.getDY() * this.height / this.mc.resolution.getScaledHeightScreenCoords(); // field_6325_d
 		for (int button = 0; button < Mouse.getButtonCount(); button++) {
 			if (Mouse.isButtonDown(button)) {
 				modList.mouseDragged(mouseX, mouseY, button, mouseDX, mouseDY);
@@ -318,8 +329,8 @@ public class ModListScreen extends Screen {
 			GLRenderer.setColor4f(1, 1, 1, 1);
 
 			this.selected.bindIconTexture();
-            ModListEntry.internalRender(paneY, x);
-            int lineSpacing = 9 + 1;
+			ModListEntry.internalRender(paneY, x);
+			int lineSpacing = 9 + 1;
 			int imageOffset = 36;
 			String name = metadata.getName();
 			if (name.equals("Minecraft")){ // BAD CODE
@@ -328,8 +339,8 @@ public class ModListScreen extends Screen {
 			name = HardcodedUtil.formatFabricModuleName(name);
 			String trimmedName = name;
 			int maxNameWidth = this.width - (x + imageOffset);
-            trimmedName = getString(font, name, trimmedName, maxNameWidth);
-            this.drawStringNoShadow(font, trimmedName, x + imageOffset, paneY + 1, 0xFFFFFF);
+			trimmedName = getString(font, name, trimmedName, maxNameWidth);
+			this.drawStringNoShadow(font, trimmedName, x + imageOffset, paneY + 1, 0xFFFFFF);
 			if (mouseX > x + imageOffset && mouseY > paneY + 1 && mouseY < paneY + 1 + 9 && mouseX < x + imageOffset + fontRenderer.stringWidth(trimmedName)) {
 				setTooltip(i18n.translateKeyAndFormat("modmenu.modIdToolTip", metadata.getId()));
 			}
@@ -349,10 +360,10 @@ public class ModListScreen extends Screen {
 			List<String> names = new ArrayList<>();
 
 			metadata.getAuthors().stream()
-				.filter(Objects::nonNull)
-				.map(Person::getName)
-				.filter(Objects::nonNull)
-				.forEach(names::add);
+					.filter(Objects::nonNull)
+					.map(Person::getName)
+					.filter(Objects::nonNull)
+					.forEach(names::add);
 
 			if (!names.isEmpty()) {
 				if (names.size() > 1) {
@@ -372,19 +383,19 @@ public class ModListScreen extends Screen {
 		GLRenderer.popFrame();
 	}
 
-    static String getString(FontRenderer fontRenderer, String name, String trimmedName, int maxNameWidth) {
-        if (fontRenderer.stringWidth(name) > maxNameWidth) {
-            int maxWidth = maxNameWidth - fontRenderer.stringWidth("...");
-            trimmedName = "";
-            while (fontRenderer.stringWidth(trimmedName) < maxWidth && trimmedName.length() < name.length()) {
-                trimmedName += name.charAt(trimmedName.length());
-            }
-            trimmedName = trimmedName.isEmpty() ? "..." : trimmedName.substring(0, trimmedName.length() - 1) + "...";
-        }
-        return trimmedName;
-    }
+	static String getString(FontRenderer fontRenderer, String name, String trimmedName, int maxNameWidth) {
+		if (fontRenderer.stringWidth(name) > maxNameWidth) {
+			int maxWidth = maxNameWidth - fontRenderer.stringWidth("...");
+			trimmedName = "";
+			while (fontRenderer.stringWidth(trimmedName) < maxWidth && trimmedName.length() < name.length()) {
+				trimmedName += name.charAt(trimmedName.length());
+			}
+			trimmedName = trimmedName.isEmpty() ? "..." : trimmedName.substring(0, trimmedName.length() - 1) + "...";
+		}
+		return trimmedName;
+	}
 
-    public void overlayBackground(int x1, int y1, int x2, int y2, int red, int green, int blue, int startAlpha, int endAlpha) {
+	public void overlayBackground(int x1, int y1, int x2, int y2, int red, int green, int blue, int startAlpha, int endAlpha) {
 
 		GLRenderer.pushFrame();
 		GLRenderer.setShader(Shaders.INTERFACE);
