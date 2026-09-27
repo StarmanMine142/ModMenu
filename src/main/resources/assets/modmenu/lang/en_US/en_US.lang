@@ -26,3 +26,12 @@ modmenu.sorting.ascending=A-Z
 modmenu.sorting.decending=Z-A
 modmenu.minecraft=Minecraft
 modmenu.forge=Forge
+
+modmenu.nameTranslation.minecraft=Better than Adventure!
+modmenu.descriptionTranslation.minecraft=The base game.
+modmenu.nameTranslation.fabricloader=Fabric Loader
+modmenu.descriptionTranslation.fabricloader=The base mod loader.
+modmenu.nameTranslation.modmenu=Mod Menu
+modmenu.descriptionTranslation.modmenu=Adds a mod menu to view the list of mods you have installed.
+modmenu.nameTranslation.java=Java
+modmenu.descriptionTranslation.java=The Java runtime environment.
