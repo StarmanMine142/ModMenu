@@ -279,7 +279,7 @@ public class ModListScreen extends Screen {
 	@Override
 	public void render(int mouseX, int mouseY, float delta) {
 		I18n i18n = I18n.getInstance();
-		
+
 		int dWheel = Mouse.getDWheel();
 		if (dWheel != 0) {
 			double scrollDelta = dWheel > 0 ? 1.0 : -1.0;
@@ -332,11 +332,18 @@ public class ModListScreen extends Screen {
 			ModListEntry.internalRender(paneY, x);
 			int lineSpacing = 9 + 1;
 			int imageOffset = 36;
-			String name = metadata.getName();
-			if (name.equals("Minecraft")){ // BAD CODE
-				name = "Better than Adventure";
+			String id = metadata.getId();
+			String translationKey = "modmenu.nameTranslation." + id;
+			String translatedName = i18n.translateKey(translationKey);
+			String name;
+			if (!translatedName.equals(translationKey)) {
+				name = translatedName;
+			} else {
+				name = metadata.getName();
+				name = HardcodedUtil.formatFabricModuleName(name);
 			}
 			name = HardcodedUtil.formatFabricModuleName(name);
+
 			String trimmedName = name;
 			int maxNameWidth = this.width - (x + imageOffset);
 			trimmedName = getString(font, name, trimmedName, maxNameWidth);
