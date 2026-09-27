@@ -14,6 +14,7 @@ import net.minecraft.client.render.renderer.GLRenderer;
 import net.minecraft.client.render.renderer.Shaders;
 import net.minecraft.client.render.renderer.State;
 import net.minecraft.client.render.tessellator.TessellatorGeneral;
+import net.minecraft.core.lang.I18n;
 import org.lwjgl.opengl.GL11;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,9 +53,15 @@ public class ModListEntry extends AlwaysSelectedEntryListWidget.Entry<ModListEnt
 		GLRenderer.setColor4f(1, 1, 1, 1); // We LOVE random color calls
 		this.bindIconTexture();
         internalRender(y, x);
-		String name = metadata.getName();
-		if (name.equals("Minecraft")){  // BAD CODE
-			name = "Better than Adventure";
+		String id = metadata.getId();
+		String translationKey = "modmenu.nameTranslation." + id;
+		String translatedName = I18n.getInstance().translateKey(translationKey);
+		String name;
+		if (!translatedName.equals(translationKey)) {
+			name = translatedName;
+		} else {
+			name = metadata.getName();
+			name = HardcodedUtil.formatFabricModuleName(name);
 		}
         name = HardcodedUtil.formatFabricModuleName(name);
 		String trimmedName = name;
@@ -63,9 +70,13 @@ public class ModListEntry extends AlwaysSelectedEntryListWidget.Entry<ModListEnt
         trimmedName = ModListScreen.getString(fontRenderer, name, trimmedName, maxNameWidth);
         this.drawStringNoShadow(font, trimmedName, x + 32 + 3, y + 1, 0xFFFFFF);
 		new BadgeRenderer(client, x + 32 + 3 + font.stringWidth(name) + 2, y, x + rowWidth, container, list.getParent()).draw(mouseX, mouseY);
-		String description = metadata.getDescription();
-		if (description.isEmpty() && HardcodedUtil.getHardcodedDescriptions().containsKey(metadata.getId())) {
-			description = HardcodedUtil.getHardcodedDescription(metadata.getId());
+		String descKey = "modmenu.descriptionTranslation." + id;
+		String translatedDesc = I18n.getInstance().translateKey(descKey);
+		String description;
+		if (!translatedDesc.equals(descKey)) {
+			description = translatedDesc;
+		} else {
+			description = metadata.getDescription();
 		}
 		RenderUtils.INSTANCE.drawWrappedString(this, description, (x + 32 + 3 + 4), (y + 9 + 2), rowWidth - 32 - 7, 2, 0x808080);
 
