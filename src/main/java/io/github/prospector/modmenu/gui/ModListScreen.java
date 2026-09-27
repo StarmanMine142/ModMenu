@@ -17,6 +17,7 @@ import net.minecraft.client.render.renderer.GLRenderer;
 import net.minecraft.client.render.renderer.Shaders;
 import net.minecraft.client.render.renderer.State;
 import net.minecraft.client.render.tessellator.TessellatorGeneral;
+import net.minecraft.client.util.helper.UrlHelper;
 import net.minecraft.core.Global;
 import net.minecraft.core.lang.I18n;
 import org.lwjgl.Sys;
@@ -207,13 +208,11 @@ public class ModListScreen extends Screen {
 				break;
 			}
 			case WEBSITE_BUTTON_ID: {
-				final ModMetadata metadata = Objects.requireNonNull(selected).getMetadata();
-				metadata.getContact().get("homepage").ifPresent(Sys::openURL);
+				Objects.requireNonNull(selected).getMetadata().getContact().get("homepage").ifPresent(UrlHelper::openURL);
 				break;
 			}
 			case ISSUES_BUTTON_ID: {
-				final ModMetadata metadata = Objects.requireNonNull(selected).getMetadata();
-				metadata.getContact().get("issues").ifPresent(Sys::openURL);
+				Objects.requireNonNull(selected).getMetadata().getContact().get("issues").ifPresent(UrlHelper::openURL);
 				break;
 			}
 			case TOGGLE_FILTER_OPTIONS_BUTTON_ID: {
