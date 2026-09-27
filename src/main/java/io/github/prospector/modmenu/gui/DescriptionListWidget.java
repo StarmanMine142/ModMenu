@@ -44,11 +44,20 @@ public class DescriptionListWidget extends EntryListWidget<DescriptionListWidget
 			lastSelected = selectedEntry;
 			clearEntries();
 			setScrollAmount(-Double.MAX_VALUE);
-			String description = lastSelected.getMetadata().getDescription();
-			String id = lastSelected.getMetadata().getId();
-            Collection<Person> authors = lastSelected.getMetadata().getAuthors();
-            Collection<Person> contributors = lastSelected.getMetadata().getContributors();
-            Collection<String> licenses = lastSelected.getMetadata().getLicense();
+			String id = selectedEntry.getMetadata().getId();
+			String descKey = "modmenu.descriptionTranslation." + id;
+			String translatedDesc = i18n.translateKey(descKey);
+
+			String description;
+			if (!translatedDesc.equals(descKey)) {
+				description = translatedDesc;
+			} else {
+				description = selectedEntry.getMetadata().getDescription();
+			}
+
+			Collection<Person> authors = selectedEntry.getMetadata().getAuthors();
+			Collection<Person> contributors = selectedEntry.getMetadata().getContributors();
+			Collection<String> licenses = selectedEntry.getMetadata().getLicense();
 			if (description.isEmpty() && HardcodedUtil.getHardcodedDescriptions().containsKey(id)) {
 				description = HardcodedUtil.getHardcodedDescription(id);
 			}
