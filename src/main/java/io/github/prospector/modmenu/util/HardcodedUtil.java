@@ -15,10 +15,6 @@ public final class HardcodedUtil {
 	private static final Set<String> FABRIC_MODS = new HashSet<>();
 	private static final HashMap<String, String> HARDCODED_DESCRIPTIONS = new HashMap<>();
 
-	public static void initializeHardcodings() {
-		HARDCODED_DESCRIPTIONS.put("minecraft", new Random().nextInt(1000) == 0 ? "The based game." : "The base game.");
-	}
-
 	public static void hardcodeModuleMetadata(ModContainer mod, ModMetadata metadata, String id) {
 		Matcher matcher = FABRIC_PATTERN.matcher(id);
 		if (matcher.matches() || id.equals("fabric-api-base") || id.equals("fabric-renderer-indigo")) {
