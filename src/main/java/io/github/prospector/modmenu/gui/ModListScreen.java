@@ -355,12 +355,9 @@ public class ModListScreen extends Screen {
 				init = false;
 			}
 			badgeRenderer.draw(mouseX, mouseY);
-			String versionString;
-			if (metadata.getName().equals("Minecraft")){  // BAD CODE
-				versionString = Global.VERSION;
-			} else {
-				versionString = metadata.getVersion().getFriendlyString();
-			}
+			String versionString = metadata.getId().equals("minecraft")
+			? Global.VERSION
+			: metadata.getVersion().getFriendlyString();
 			this.drawStringNoShadow(font, "v" + versionString, x + imageOffset, paneY + 2 + lineSpacing, 0x808080);
 			String authors;
 			List<String> names = new ArrayList<>();
