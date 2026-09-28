@@ -58,9 +58,6 @@ public class DescriptionListWidget extends EntryListWidget<DescriptionListWidget
 			Collection<Person> authors = selectedEntry.getMetadata().getAuthors();
 			Collection<Person> contributors = selectedEntry.getMetadata().getContributors();
 			Collection<String> licenses = selectedEntry.getMetadata().getLicense();
-			if (description.isEmpty() && HardcodedUtil.getHardcodedDescriptions().containsKey(id)) {
-				description = HardcodedUtil.getHardcodedDescription(id);
-			}
 			if (lastSelected != null && description != null && !description.isEmpty()) {
 				for (String line : RenderUtils.INSTANCE.wrapStringToWidthAsList(textRenderer, description.replaceAll("\n", "\n\n"), getRowWidth())) {
 					children().add(new DescriptionEntry(line));
