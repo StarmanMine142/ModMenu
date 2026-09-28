@@ -13,7 +13,6 @@ import java.util.regex.Pattern;
 public final class HardcodedUtil {
 	private static final Pattern FABRIC_PATTERN = Pattern.compile("^fabric-.*(-v\\d+)$");
 	private static final Set<String> FABRIC_MODS = new HashSet<>();
-	private static final HashMap<String, String> HARDCODED_DESCRIPTIONS = new HashMap<>();
 
 	public static void hardcodeModuleMetadata(ModContainer mod, ModMetadata metadata, String id) {
 		Matcher matcher = FABRIC_PATTERN.matcher(id);
@@ -65,15 +64,7 @@ public final class HardcodedUtil {
 		return sb.toString();
 	}
 
-	public static String getHardcodedDescription(String id) {
-		return HARDCODED_DESCRIPTIONS.getOrDefault(id, "");
-	}
-
 	public static Set<String> getFabricMods() {
 		return FABRIC_MODS;
-	}
-
-	public static HashMap<String, String> getHardcodedDescriptions() {
-		return HARDCODED_DESCRIPTIONS;
 	}
 }
