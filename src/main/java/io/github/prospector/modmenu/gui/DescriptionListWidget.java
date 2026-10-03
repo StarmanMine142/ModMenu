@@ -1,14 +1,18 @@
 package io.github.prospector.modmenu.gui;
 
 
-import io.github.prospector.modmenu.util.HardcodedUtil;
 import io.github.prospector.modmenu.util.RenderUtils;
+import net.fabricmc.loader.api.metadata.ContactInformation;
 import net.fabricmc.loader.api.metadata.Person;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.render.font.FontRenderer;
+import net.minecraft.client.util.helper.UrlHelper;
 import net.minecraft.core.lang.I18n;
+import net.minecraft.core.net.command.TextFormatting;
 
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 public class DescriptionListWidget extends EntryListWidget<DescriptionListWidget.DescriptionEntry> {
 	private final ModListScreen parent;
@@ -36,6 +40,37 @@ public class DescriptionListWidget extends EntryListWidget<DescriptionListWidget
 		return this.width - 6 + left;
 	}
 
+	protected class LinkEntry extends DescriptionEntry {
+		private final String link;
+		private final int indent;
+		private int lastRenderX;
+		private int lastRenderY;
+
+		public LinkEntry(String text, String link, int indent) {
+			super(text);
+			this.link = link;
+			this.indent = indent;
+		}
+
+		@Override
+		public void render(int index, int y, int x, int itemWidth, int itemHeight, int mouseX, int mouseY, boolean isSelected, float delta) {
+			this.lastRenderX = x + indent;
+			this.lastRenderY = y;
+
+			String formattedText = TextFormatting.formatted(text, TextFormatting.BLUE, TextFormatting.UNDERLINE);
+			this.drawStringShadow(this.fontRenderer, formattedText, lastRenderX, lastRenderY, 0xFFFFFF);
+		}
+
+		public void mouseClicked(int mouseX, int mouseY, int button) {
+			if (button == 0) {
+				int textWidth = fontRenderer.stringWidth(text);
+				if (mouseX >= lastRenderX && mouseX <= lastRenderX + textWidth && mouseY >= lastRenderY && mouseY <= lastRenderY + 12) {
+					UrlHelper.openURL(link);
+				}
+			}
+		}
+	}
+
 	@Override
 	public void render(int mouseX, int mouseY, float delta) {
 		I18n i18n = I18n.getInstance();
@@ -58,11 +93,13 @@ public class DescriptionListWidget extends EntryListWidget<DescriptionListWidget
 			Collection<Person> authors = selectedEntry.getMetadata().getAuthors();
 			Collection<Person> contributors = selectedEntry.getMetadata().getContributors();
 			Collection<String> licenses = selectedEntry.getMetadata().getLicense();
+			
 			if (lastSelected != null && description != null && !description.isEmpty()) {
 				for (String line : RenderUtils.INSTANCE.wrapStringToWidthAsList(textRenderer, description.replaceAll("\n", "\n\n"), getRowWidth())) {
 					children().add(new DescriptionEntry(line));
 				}
 			}
+			
             if (!authors.isEmpty()) {
                 if (!children().isEmpty()) children().add(new DescriptionEntry(""));
                 children().add(new DescriptionEntry(i18n.translateKey("modmenu.authors")));
@@ -70,6 +107,7 @@ public class DescriptionListWidget extends EntryListWidget<DescriptionListWidget
                     children().add(new DescriptionEntry("    " + person.getName()));
                 }
             }
+			
             if (!contributors.isEmpty()) {
                 if (!children().isEmpty()) children().add(new DescriptionEntry(""));
                 children().add(new DescriptionEntry(i18n.translateKey("modmenu.contributors")));
@@ -77,6 +115,36 @@ public class DescriptionListWidget extends EntryListWidget<DescriptionListWidget
                     children().add(new DescriptionEntry("    " + person.getName()));
                 }
             }
+			
+			ContactInformation contact = selectedEntry.getMetadata().getContact();
+			Map<String, String> links = new HashMap<>(contact.asMap());
+
+			links.remove("homepage");
+			links.remove("issues");
+
+			if (!links.isEmpty()) {
+				children().add(new DescriptionEntry(""));
+
+				for (String line : RenderUtils.INSTANCE.wrapStringToWidthAsList(textRenderer, i18n.translateKey("modmenu.links"), getRowWidth())) {
+					children().add(new DescriptionEntry(line));
+				}
+
+				links.forEach((key, value) -> {
+					int indent = 8;
+					String translationKey = "modmenu." + key;
+					String translatedKey = i18n.translateKey(translationKey);
+
+					if (translatedKey.equals(translationKey)) {
+						translatedKey = Character.toUpperCase(key.charAt(0)) + key.substring(1);
+					}
+
+					for (String line : RenderUtils.INSTANCE.wrapStringToWidthAsList(textRenderer, translatedKey, getRowWidth() - 16)) {
+						children().add(new LinkEntry(line, value, indent));
+						indent = 16;
+					}
+				});
+			}
+			
             if (!licenses.isEmpty()) {
                 if (!children().isEmpty()) children().add(new DescriptionEntry(""));
                 children().add(new DescriptionEntry(i18n.translateKey("modmenu.licenses")));
@@ -86,6 +154,16 @@ public class DescriptionListWidget extends EntryListWidget<DescriptionListWidget
             }
 		}
 		super.render(mouseX, mouseY, delta);
+	}
+
+	@Override
+	public void mouseClicked(int mouseX, int mouseY, int button) {
+		super.mouseClicked(mouseX, mouseY, button);
+		for (DescriptionEntry entry : children()) {
+			if (entry instanceof LinkEntry) {
+				entry.mouseClicked(mouseX, mouseY, button);
+			}
+		}
 	}
 
 	@Override
