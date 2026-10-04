@@ -67,3 +67,4 @@ modmenu.nameTranslation.modmenu=Mod Menu
 modmenu.descriptionTranslation.modmenu=Adds a mod menu to view the list of mods you have installed.
 modmenu.nameTranslation.java=Java
 modmenu.descriptionTranslation.java=The Java runtime environment.
+modmenu.javaDistributionName=Running: %s
