@@ -1,5 +1,6 @@
 package io.github.prospector.modmenu.config;
 
+
 import net.fabricmc.loader.api.ModContainer;
 import net.minecraft.core.lang.I18n;
 
