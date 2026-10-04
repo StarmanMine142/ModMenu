@@ -32,14 +32,12 @@ public final class ModListSearch {
 		ModMetadata metadata = container.getMetadata();
 		String modId = metadata.getId();
 
-
 		//Some basic search, could do with something more advanced but this will do for now
 		I18n i18n = I18n.getInstance();
 		String translationKey = "modmenu.nameTranslation." + modId;
 		String translatedName = I18n.getInstance().translateKey(translationKey);
-
 		String modName = !translatedName.equals(translationKey) ? translatedName : metadata.getName();
-
+		
 		if (modName.toLowerCase(Locale.ROOT).contains(query) // Search mod name
 				|| modId.toLowerCase(Locale.ROOT).contains(query) // Search mod name
 				|| authorMatches(container, query) // Search via author
