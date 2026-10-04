@@ -90,16 +90,29 @@ public class DescriptionListWidget extends EntryListWidget<DescriptionListWidget
 				description = selectedEntry.getMetadata().getDescription();
 			}
 
+			if ("java".equals(id)) {
+				String vendor = System.getProperty("java.vendor", "Unknown Vendor");
+				String javaDist = i18n.translateKeyAndFormat("modmenu.javaDistributionName", vendor);
+				description = (description != null ? description : "") + "\n" + javaDist;
+			}
+
+			if (lastSelected != null && description != null && !description.isEmpty()) {
+				String[] paragraphs = description.split("\r?\n");
+				for (String paragraph : paragraphs) {
+					if (paragraph.isEmpty()) {
+						children().add(new DescriptionEntry(""));
+						continue;
+					}
+					for (String line : RenderUtils.INSTANCE.wrapStringToWidthAsList(textRenderer, paragraph, getRowWidth())) {
+						children().add(new DescriptionEntry(line));
+					}
+				}
+			}
+
 			Collection<Person> authors = selectedEntry.getMetadata().getAuthors();
 			Collection<Person> contributors = selectedEntry.getMetadata().getContributors();
 			Collection<String> licenses = selectedEntry.getMetadata().getLicense();
-			
-			if (lastSelected != null && description != null && !description.isEmpty()) {
-				for (String line : RenderUtils.INSTANCE.wrapStringToWidthAsList(textRenderer, description.replaceAll("\n", "\n\n"), getRowWidth())) {
-					children().add(new DescriptionEntry(line));
-				}
-			}
-			
+
             if (!authors.isEmpty()) {
                 if (!children().isEmpty()) children().add(new DescriptionEntry(""));
                 children().add(new DescriptionEntry(i18n.translateKey("modmenu.authors")));
@@ -107,7 +120,7 @@ public class DescriptionListWidget extends EntryListWidget<DescriptionListWidget
                     children().add(new DescriptionEntry("    " + person.getName()));
                 }
             }
-			
+
             if (!contributors.isEmpty()) {
                 if (!children().isEmpty()) children().add(new DescriptionEntry(""));
                 children().add(new DescriptionEntry(i18n.translateKey("modmenu.contributors")));
@@ -115,7 +128,7 @@ public class DescriptionListWidget extends EntryListWidget<DescriptionListWidget
                     children().add(new DescriptionEntry("    " + person.getName()));
                 }
             }
-			
+
 			ContactInformation contact = selectedEntry.getMetadata().getContact();
 			Map<String, String> links = new HashMap<>(contact.asMap());
 
@@ -144,7 +157,7 @@ public class DescriptionListWidget extends EntryListWidget<DescriptionListWidget
 					}
 				});
 			}
-			
+
             if (!licenses.isEmpty()) {
                 if (!children().isEmpty()) children().add(new DescriptionEntry(""));
                 children().add(new DescriptionEntry(i18n.translateKey("modmenu.licenses")));
