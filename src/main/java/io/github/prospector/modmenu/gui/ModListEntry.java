@@ -3,7 +3,6 @@ package io.github.prospector.modmenu.gui;
 
 import io.github.prospector.modmenu.ModMenu;
 import io.github.prospector.modmenu.util.BadgeRenderer;
-import io.github.prospector.modmenu.util.HardcodedUtil;
 import io.github.prospector.modmenu.util.RenderUtils;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
@@ -61,9 +60,7 @@ public class ModListEntry extends AlwaysSelectedEntryListWidget.Entry<ModListEnt
 			name = translatedName;
 		} else {
 			name = metadata.getName();
-			name = HardcodedUtil.formatFabricModuleName(name);
 		}
-        name = HardcodedUtil.formatFabricModuleName(name);
 		String trimmedName = name;
 		int maxNameWidth = rowWidth - 32 - 3;
 		FontRenderer font = this.fontRenderer;
@@ -108,9 +105,7 @@ public class ModListEntry extends AlwaysSelectedEntryListWidget.Entry<ModListEnt
 			}
 			if (!Files.exists(path)) {
 				ModContainer modMenu = FabricLoader.getInstance().getModContainer(ModMenu.MOD_ID).orElseThrow(IllegalAccessError::new);
-				if (HardcodedUtil.getFabricMods().contains(metadata.getId())) {
-					path = modMenu.getPath("assets/" + ModMenu.MOD_ID + "/fabric_icon.png");
-				} else if (metadata.getId().equals("minecraft")) {
+				if (metadata.getId().equals("minecraft")) {
 					path = modMenu.getPath("assets/" + ModMenu.MOD_ID + "/mc_icon.png");
 				} else if (metadata.getId().equals("java")) {
 					path = modMenu.getPath("assets/" + ModMenu.MOD_ID + "/java_icon.png");

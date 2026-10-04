@@ -4,7 +4,6 @@ import io.github.prospector.modmenu.ModMenu;
 import io.github.prospector.modmenu.config.ModMenuConfigManager;
 import io.github.prospector.modmenu.util.BadgeRenderer;
 import io.github.prospector.modmenu.util.ButtonUtil;
-import io.github.prospector.modmenu.util.HardcodedUtil;
 import io.github.prospector.modmenu.util.RenderUtils;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.metadata.ModMetadata;
@@ -21,7 +20,6 @@ import net.minecraft.client.util.helper.FileOpener;
 import net.minecraft.client.util.helper.UrlHelper;
 import net.minecraft.core.Global;
 import net.minecraft.core.lang.I18n;
-import org.lwjgl.Sys;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL41;
@@ -30,7 +28,6 @@ import org.slf4j.LoggerFactory;
 import org.spongepowered.include.com.google.common.base.Joiner;
 
 import java.io.File;
-import java.net.MalformedURLException;
 import java.text.NumberFormat;
 import java.util.*;
 
@@ -343,9 +340,7 @@ public class ModListScreen extends Screen {
 				name = translatedName;
 			} else {
 				name = metadata.getName();
-				name = HardcodedUtil.formatFabricModuleName(name);
 			}
-			name = HardcodedUtil.formatFabricModuleName(name);
 
 			String trimmedName = name;
 			int maxNameWidth = this.width - (x + imageOffset);

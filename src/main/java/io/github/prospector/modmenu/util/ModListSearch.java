@@ -6,6 +6,7 @@ import io.github.prospector.modmenu.gui.ModListScreen;
 import net.fabricmc.loader.api.ModContainer;
 import net.fabricmc.loader.api.metadata.ModMetadata;
 import net.fabricmc.loader.api.metadata.Person;
+import net.minecraft.core.lang.I18n;
 
 import java.util.List;
 import java.util.Locale;
@@ -33,13 +34,20 @@ public final class ModListSearch {
 
 
 		//Some basic search, could do with something more advanced but this will do for now
-		if (HardcodedUtil.formatFabricModuleName(metadata.getName()).toLowerCase(Locale.ROOT).contains(query) //Search mod name
-			|| modId.toLowerCase(Locale.ROOT).contains(query) // Search mod name
-			|| authorMatches(container, query) //Search via author
-			|| (ModMenu.LIBRARY_MODS.contains(modId) && "api library".contains(query)) //Search for lib mods
-			|| ("clientside".contains(query) && ModMenu.CLIENTSIDE_MODS.contains(modId)) //Search for clientside mods
-            || ("deprecated".contains(query) && ModMenu.DEPRECATED_MODS.contains(modId)) //Search for clientside mods
-			|| ("configurations configs configures configurable".contains(query) && ModMenu.hasConfigScreenFactory(modId)) //Search for mods that can be configured
+		I18n i18n = I18n.getInstance();
+		String translationKey = "modmenu.nameTranslation." + modId;
+		String translatedName = I18n.getInstance().translateKey(translationKey);
+
+		String modName = !translatedName.equals(translationKey) ? translatedName : metadata.getName();
+
+		if (modName.toLowerCase(Locale.ROOT).contains(query) // Search mod name
+				|| modId.toLowerCase(Locale.ROOT).contains(query) // Search mod name
+				|| authorMatches(container, query) // Search via author
+				|| (ModMenu.LIBRARY_MODS.contains(modId) && i18n.translateKey("modmenu.searchTerms.library").toLowerCase(Locale.ROOT).contains(query)) // Search for lib mods
+				|| (ModMenu.CLIENTSIDE_MODS.contains(modId) && i18n.translateKey("modmenu.searchTerms.clientside").toLowerCase(Locale.ROOT).contains(query)) // Search for clientside mods
+				|| (ModMenu.DEPRECATED_MODS.contains(modId) && i18n.translateKey("modmenu.searchTerms.deprecated").toLowerCase(Locale.ROOT).contains(query)) // Search for deprecated mods
+				|| (ModMenu.PATCHWORK_FORGE_MODS.contains(modId) && i18n.translateKey("modmenu.searchTerms.patchwork").toLowerCase(Locale.ROOT).contains(query)) // Search for forge and patchwork
+				|| (ModMenu.hasConfigScreenFactory(modId) && i18n.translateKey("modmenu.searchTerms.configurable").toLowerCase(Locale.ROOT).contains(query)) // Search for mods that can be configured
 		) {
 			return true;
 		}

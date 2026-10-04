@@ -6,7 +6,6 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import io.github.prospector.modmenu.api.ModMenuApi;
 import io.github.prospector.modmenu.config.ModMenuConfigManager;
-import io.github.prospector.modmenu.util.HardcodedUtil;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
@@ -88,7 +87,6 @@ public class ModMenu implements ModInitializer {
         });
 		configScreenFactories.put("minecraft", (screenBase -> new ScreenOptions(screenBase, OptionsPages.GENERAL)));
 		Collection<ModContainer> mods = FabricLoader.getInstance().getAllMods();
-		HardcodedUtil.initializeHardcodings();
 		for (ModContainer mod : mods) {
 			ModMetadata metadata = mod.getMetadata();
 			String id = metadata.getId();
@@ -129,8 +127,6 @@ public class ModMenu implements ModInitializer {
 						list.add(mod);
 					});
 				}
-			} else {
-				HardcodedUtil.hardcodeModuleMetadata(mod, metadata, id);
 			}
 		}
 	}

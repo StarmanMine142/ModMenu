@@ -13,9 +13,6 @@ modmenu.authors=Authors:
 modmenu.contributors=Contributors:
 modmenu.licenses=Licenses:
 modmenu.search=Search for mods
-modmenu.clientsideOnly=Client
-modmenu.library=Library
-modmenu.deprecated=Deprecated
 modmenu.toggleFilterOptions=Toggle Filter Options
 modmenu.showLibraries=Libraries: %s
 modmenu.showLibraries.true=Shown
@@ -24,8 +21,20 @@ modmenu.showingMods=Showing %s Mods
 modmenu.sorting=Sort: %s
 modmenu.sorting.ascending=A-Z
 modmenu.sorting.decending=Z-A
-modmenu.minecraft=Minecraft
-modmenu.forge=Forge
+
+modmenu.searchTerms.library=api library
+modmenu.searchTerms.patchwork=patchwork forge fml
+modmenu.searchTerms.modpack=modpack pack
+modmenu.searchTerms.deprecated=deprecated outdated old
+modmenu.searchTerms.clientside=clientside gameside
+modmenu.searchTerms.configurable=configurations configs configures configurable options settings
+modmenu.searchTerms.hasUpdate=updates version
+
+modmenu.badge.clientsideOnly=Client
+modmenu.badge.library=Library
+modmenu.badge.deprecated=Deprecated
+modmenu.badge.minecraft=Minecraft
+modmenu.badge.forge=Forge
 
 modmenu.links=Links:
 modmenu.sources=Source

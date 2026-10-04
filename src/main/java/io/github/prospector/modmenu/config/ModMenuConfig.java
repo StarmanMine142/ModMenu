@@ -1,7 +1,5 @@
 package io.github.prospector.modmenu.config;
 
-
-import io.github.prospector.modmenu.util.HardcodedUtil;
 import net.fabricmc.loader.api.ModContainer;
 import net.minecraft.core.lang.I18n;
 
@@ -30,8 +28,8 @@ public class ModMenuConfig {
 	}
 
 	public enum Sorting {
-		ASCENDING(Comparator.comparing(modContainer -> HardcodedUtil.formatFabricModuleName(modContainer.getMetadata().getName())), "modmenu.sorting.ascending"),
-		DECENDING(ASCENDING.getComparator().reversed(), "modmenu.sorting.decending");
+		ASCENDING(Comparator.comparing(modContainer -> modContainer.getMetadata().getName(), String.CASE_INSENSITIVE_ORDER),"modmenu.sorting.ascending"),
+		DESCENDING(ASCENDING.getComparator().reversed(),"modmenu.sorting.decending");
 
 		final Comparator<ModContainer> comparator;
 		final String key;
