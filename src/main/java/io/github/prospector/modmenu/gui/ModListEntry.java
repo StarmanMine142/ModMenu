@@ -44,6 +44,7 @@ public class ModListEntry extends AlwaysSelectedEntryListWidget.Entry<ModListEnt
 
 	@Override
 	public void render(int index, int y, int x, int rowWidth, int rowHeight, int mouseX, int mouseY, boolean isSelected, float delta) {
+		I18n i18n = I18n.getInstance();
 		x += getXOffset();
 		rowWidth -= getXOffset();
 
@@ -52,9 +53,10 @@ public class ModListEntry extends AlwaysSelectedEntryListWidget.Entry<ModListEnt
 		GLRenderer.setColor4f(1, 1, 1, 1); // We LOVE random color calls
 		this.bindIconTexture();
         internalRender(y, x);
+
 		String id = metadata.getId();
 		String translationKey = "modmenu.nameTranslation." + id;
-		String translatedName = I18n.getInstance().translateKey(translationKey);
+		String translatedName = i18n.translateKey(translationKey);
 		String name;
 		if (!translatedName.equals(translationKey)) {
 			name = translatedName;
@@ -67,15 +69,30 @@ public class ModListEntry extends AlwaysSelectedEntryListWidget.Entry<ModListEnt
         trimmedName = ModListScreen.getString(fontRenderer, name, trimmedName, maxNameWidth);
         this.drawStringNoShadow(font, trimmedName, x + 32 + 3, y + 1, 0xFFFFFF);
 		new BadgeRenderer(client, x + 32 + 3 + font.stringWidth(name) + 2, y, x + rowWidth, container, list.getParent()).draw(mouseX, mouseY);
+
 		String descKey = "modmenu.descriptionTranslation." + id;
-		String translatedDesc = I18n.getInstance().translateKey(descKey);
+		String translatedDesc = i18n.translateKey(descKey);
 		String description;
 		if (!translatedDesc.equals(descKey)) {
 			description = translatedDesc;
 		} else {
 			description = metadata.getDescription();
 		}
-		RenderUtils.INSTANCE.drawWrappedString(this, description, (x + 32 + 3 + 4), (y + 9 + 2), rowWidth - 32 - 7, 2, 0x808080);
+
+		if ("java".equals(id)) {
+			String vendor = System.getProperty("java.vendor", "Unknown Vendor");
+			String javaDist = i18n.translateKeyAndFormat("modmenu.javaDistributionName", vendor);
+			description = (description != null ? description : "") + " " + javaDist;
+		}
+
+		if (description != null) {
+			String cleanDescription = description.replaceAll("\r?\n", " ");
+			int textX = x + 32 + 3 + 4;
+			int textY = y + 9 + 2;
+			int maxWidth = rowWidth - 32 - 7;
+
+			RenderUtils.INSTANCE.drawWrappedString(this, cleanDescription, textX, textY, maxWidth, 2, 0x808080);
+		}
 
 		GLRenderer.popFrame();
 	}
