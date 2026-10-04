@@ -17,6 +17,7 @@ import net.minecraft.client.render.renderer.GLRenderer;
 import net.minecraft.client.render.renderer.Shaders;
 import net.minecraft.client.render.renderer.State;
 import net.minecraft.client.render.tessellator.TessellatorGeneral;
+import net.minecraft.client.util.helper.FileOpener;
 import net.minecraft.client.util.helper.UrlHelper;
 import net.minecraft.core.Global;
 import net.minecraft.core.lang.I18n;
@@ -231,10 +232,13 @@ public class ModListScreen extends Screen {
 			}
 			case MODS_FOLDER_BUTTON_ID: {
 				File modsFolder = new File(FabricLoader.getInstance().getGameDir().toFile(), "mods");
+				if (!modsFolder.exists()) {
+					modsFolder.mkdirs();
+				}
 				try {
-					Sys.openURL(modsFolder.toURI().toURL().toString());
-				} catch (MalformedURLException e) {
-					LOGGER.error("Malformed mods folder URL", e);
+					FileOpener.open(modsFolder);
+				} catch (Exception e) {
+					LOGGER.error("Failed to open mods folder", e);
 				}
 				break;
 			}
