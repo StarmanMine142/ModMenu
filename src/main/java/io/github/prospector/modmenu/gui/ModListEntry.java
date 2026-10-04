@@ -82,16 +82,29 @@ public class ModListEntry extends AlwaysSelectedEntryListWidget.Entry<ModListEnt
 		if ("java".equals(id)) {
 			String vendor = System.getProperty("java.vendor", "Unknown Vendor");
 			String javaDist = i18n.translateKeyAndFormat("modmenu.javaDistributionName", vendor);
-			description = (description != null ? description : "") + " " + javaDist;
+			description = (description != null ? description : "") + "\n" + javaDist;
 		}
 
 		if (description != null) {
-			String cleanDescription = description.replaceAll("\r?\n", " ");
 			int textX = x + 32 + 3 + 4;
 			int textY = y + 9 + 2;
 			int maxWidth = rowWidth - 32 - 7;
-
-			RenderUtils.INSTANCE.drawWrappedString(this, cleanDescription, textX, textY, maxWidth, 2, 0x808080);
+			int maxLines = 2;
+			int currentLine = 0;
+			
+            font = this.fontRenderer;
+			String[] paragraphs = description.split("\r?\n");
+			
+			for (String paragraph : paragraphs) {
+				if (currentLine >= maxLines) break;
+				
+				for (String line : RenderUtils.INSTANCE.wrapStringToWidthAsList(font, paragraph, maxWidth)) {
+					if (currentLine >= maxLines) break;
+					
+					this.drawStringNoShadow(font, line, textX, textY + (currentLine * 9), 0x808080);
+					currentLine++;
+				}
+			}
 		}
 
 		GLRenderer.popFrame();
