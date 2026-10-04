@@ -128,6 +128,14 @@ public class ModMenu implements ModInitializer {
 					});
 				}
 			}
+
+			// Hardcode marking as library
+			if (id.equals("fabricloader")
+					|| id.equals("fabric")
+					|| id.equals("java")
+					|| id.equals("mixinextras")) {
+				addLibraryMod(id);
+			}
 		}
 	}
 
