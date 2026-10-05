@@ -9,9 +9,6 @@
   "entrypoints": {
     "main": [
       "io.github.prospector.modmenu.ModMenu"
-    ],
-    "modmenu": [
-      "io.github.prospector.modmenu.impl.ModMenuApiImpl"
     ]
   },
   "contact": {
