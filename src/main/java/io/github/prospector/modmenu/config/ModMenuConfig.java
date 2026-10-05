@@ -30,7 +30,7 @@ public class ModMenuConfig {
 
 	public enum Sorting {
 		ASCENDING(Comparator.comparing(modContainer -> modContainer.getMetadata().getName(), String.CASE_INSENSITIVE_ORDER),"modmenu.sorting.ascending"),
-		DESCENDING(ASCENDING.getComparator().reversed(),"modmenu.sorting.decending");
+		DESCENDING(ASCENDING.getComparator().reversed(),"modmenu.sorting.descending");
 
 		final Comparator<ModContainer> comparator;
 		final String key;
