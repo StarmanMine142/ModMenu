@@ -62,10 +62,12 @@ public class ModListScreen extends Screen {
 	private static final int TOGGLE_SHOW_LIBRARIES_BUTTON_ID = 5;
 	private static final int MODS_FOLDER_BUTTON_ID = 6;
 	private static final int DONE_BUTTON_ID = 7;
+	
+	I18n i18n = I18n.getInstance();
 
 	public ModListScreen(Screen previousGui) {
 		this.parent = previousGui;
-		this.textTitle = I18n.getInstance().translateKey("modmenu.title");
+		this.textTitle = i18n.translateKey("modmenu.title");
 	}
 
 	public void updateEvents() {
@@ -92,7 +94,6 @@ public class ModListScreen extends Screen {
 
 	@Override
 	public void init() {
-		I18n i18n = I18n.getInstance();
 		Keyboard.enableRepeatEvents(true);
 		FontRenderer font = this.fontRenderer;
 		paneY = 48;
@@ -185,8 +186,8 @@ public class ModListScreen extends Screen {
 		this.buttons.add(configureButton);
 		this.buttons.add(websiteButton);
 		this.buttons.add(issuesButton);
-		this.buttons.add(ButtonUtil.createButton(MODS_FOLDER_BUTTON_ID, this.width / 2 - 154, this.height - 28, 150, 20, I18n.getInstance().translateKey("modmenu.modsFolder")));
-		this.buttons.add(ButtonUtil.createButton(DONE_BUTTON_ID, this.width / 2 + 4, this.height - 28, 150, 20, I18n.getInstance().translateKey("modmenu.done")));
+		this.buttons.add(ButtonUtil.createButton(MODS_FOLDER_BUTTON_ID, this.width / 2 - 154, this.height - 28, 150, 20, i18n.translateKey("modmenu.modsFolder")));
+		this.buttons.add(ButtonUtil.createButton(DONE_BUTTON_ID, this.width / 2 + 4, this.height - 28, 150, 20, i18n.translateKey("modmenu.done")));
 		this.searchBox.setFocused(true);
 
 		init = true;
@@ -278,8 +279,6 @@ public class ModListScreen extends Screen {
 
 	@Override
 	public void render(int mouseX, int mouseY, float delta) {
-		I18n i18n = I18n.getInstance();
-
 		int dWheel = Mouse.getDWheel();
 		if (dWheel != 0) {
 			double scrollDelta = dWheel > 0 ? 1.0 : -1.0;
