@@ -214,7 +214,6 @@ public class TestModContainer implements ModContainer {
 			return new HashMap<>();
 		}
 
-        @SuppressWarnings("UnstableApiUsage")
 		@Override
         public boolean containsCustomElement(String key) {
             return false;

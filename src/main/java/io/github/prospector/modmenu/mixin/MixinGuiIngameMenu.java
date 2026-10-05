@@ -15,7 +15,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(value = ScreenPause.class, remap = false)
 public class MixinGuiIngameMenu extends Screen {
-	@SuppressWarnings("unchecked")
 	@Inject(at = @At("RETURN"), method = "init")
 	public void modmenu$drawMenuButton(CallbackInfo info) {
 		I18n i18n = I18n.getInstance();

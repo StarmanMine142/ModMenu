@@ -20,7 +20,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
-@SuppressWarnings({"unchecked", "unused"})
+@SuppressWarnings({"unused"})
 @Environment(EnvType.CLIENT)
 public abstract class EntryListWidget<E extends EntryListWidget.Entry<E>> extends Screen {
 	protected static final int DRAG_OUTSIDE = -2;
@@ -575,6 +575,5 @@ public abstract class EntryListWidget<E extends EntryListWidget.Entry<E>> extend
 		public boolean changeFocus(boolean bl) {
 			return false;
 		}
-
 	}
 }
