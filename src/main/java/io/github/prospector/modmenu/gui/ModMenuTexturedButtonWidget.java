@@ -7,6 +7,7 @@ import net.minecraft.client.render.font.FontRenderer;
 import net.minecraft.client.render.renderer.GLRenderer;
 import net.minecraft.client.render.renderer.Shaders;
 import net.minecraft.client.render.tessellator.TessellatorGeneral;
+import net.minecraft.client.render.window.CursorShape;
 
 public class ModMenuTexturedButtonWidget extends ButtonElement {
 	private final String texture;
@@ -51,6 +52,10 @@ public class ModMenuTexturedButtonWidget extends ButtonElement {
 			FontRenderer font = mc.font;
 			boolean hovered = isHovered(mouseX, mouseY);
 
+			if (hovered && mc.currentScreen != null && this.enabled) {
+				mc.currentScreen.setDesiredCursor(CursorShape.HAND);
+			}
+			
 			int adjustedV = this.v;
 			if (!enabled) {
 				adjustedV += this.height * 2;
