@@ -5,6 +5,7 @@ import io.github.prospector.modmenu.util.RenderUtils;
 import net.fabricmc.loader.api.metadata.ContactInformation;
 import net.fabricmc.loader.api.metadata.Person;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.ScreenCredits;
 import net.minecraft.client.render.font.FontRenderer;
 import net.minecraft.client.util.helper.UrlHelper;
 import net.minecraft.core.lang.I18n;
@@ -66,6 +67,35 @@ public class DescriptionListWidget extends EntryListWidget<DescriptionListWidget
 				int textWidth = fontRenderer.stringWidth(text);
 				if (mouseX >= lastRenderX && mouseX <= lastRenderX + textWidth && mouseY >= lastRenderY && mouseY <= lastRenderY + 12) {
 					UrlHelper.openURL(link);
+				}
+			}
+		}
+	}
+
+	protected class BTACreditsEntry extends DescriptionEntry {
+		private final int indent;
+		private int lastRenderX;
+		private int lastRenderY;
+
+		public BTACreditsEntry(String text, int indent) {
+			super(text);
+			this.indent = indent;
+		}
+
+		@Override
+		public void render(int index, int y, int x, int itemWidth, int itemHeight, int mouseX, int mouseY, boolean isSelected, float delta) {
+			this.lastRenderX = x + indent;
+			this.lastRenderY = y;
+
+			String formattedText = TextFormatting.formatted(text, TextFormatting.BLUE, TextFormatting.UNDERLINE);
+			this.drawStringShadow(this.fontRenderer, formattedText, lastRenderX, lastRenderY, 0xFFFFFF);
+		}
+
+		public void mouseClicked(int mouseX, int mouseY, int button) {
+			if (button == 0) {
+				int textWidth = fontRenderer.stringWidth(text);
+				if (mouseX >= lastRenderX && mouseX <= lastRenderX + textWidth && mouseY >= lastRenderY && mouseY <= lastRenderY + 12) {
+					mc.displayScreen(new ScreenCredits(mc.currentScreen));
 				}
 			}
 		}
@@ -144,9 +174,17 @@ public class DescriptionListWidget extends EntryListWidget<DescriptionListWidget
 
 			if (!licenses.isEmpty()) {
 				if (!children().isEmpty()) children().add(new DescriptionEntry(""));
-				children().add(new DescriptionEntry(i18n.translateKey("modmenu.licenses")));
+				children().add(new DescriptionEntry(i18n.translateKey("modmenu.license")));
 				for (String license : licenses) {
 					children().add(new DescriptionEntry("    " + license));
+				}
+			}
+
+			if ("minecraft".equals(id)) {
+				if (!children().isEmpty()) children().add(new DescriptionEntry(""));
+				String viewCreditsText = i18n.translateKey("modmenu.viewCredits");
+				for (String line : RenderUtils.INSTANCE.wrapStringToWidthAsList(textRenderer, viewCreditsText, getRowWidth() - 16)) {
+					children().add(new BTACreditsEntry(line, 0));
 				}
 			}
 
@@ -177,7 +215,7 @@ public class DescriptionListWidget extends EntryListWidget<DescriptionListWidget
 	public void mouseClicked(int mouseX, int mouseY, int button) {
 		super.mouseClicked(mouseX, mouseY, button);
 		for (DescriptionEntry entry : children()) {
-			if (entry instanceof LinkEntry) {
+			if (entry instanceof LinkEntry || entry instanceof BTACreditsEntry) {
 				entry.mouseClicked(mouseX, mouseY, button);
 			}
 		}
@@ -201,5 +239,4 @@ public class DescriptionListWidget extends EntryListWidget<DescriptionListWidget
 			this.drawStringShadow(this.fontRenderer, text, x, y, 0xAAAAAA);
 		}
 	}
-
 }

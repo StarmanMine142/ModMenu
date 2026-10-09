@@ -62,7 +62,7 @@ public class ModListScreen extends Screen {
 	private static final int TOGGLE_SHOW_LIBRARIES_BUTTON_ID = 5;
 	private static final int MODS_FOLDER_BUTTON_ID = 6;
 	private static final int DONE_BUTTON_ID = 7;
-	
+
 	I18n i18n = I18n.getInstance();
 
 	public ModListScreen(Screen previousGui) {
@@ -135,16 +135,16 @@ public class ModListScreen extends Screen {
 		ButtonElement websiteButton = new ButtonElement(WEBSITE_BUTTON_ID, rightPaneX + (urlButtonWidths / 2) - (cappedButtonWidth / 2), paneY + 36, Math.min(urlButtonWidths, 200), 20, i18n.translateKey("modmenu.website")) {
 			@Override
 			public void drawButton(Minecraft mc, int var1, int var2) {
-				visible = selected != null; // visible = selected != null
-				enabled = visible && selected.getMetadata().getContact().get("homepage").isPresent();
+				visible = selected != null;
+				enabled = visible && ("minecraft".equals(selected.getMetadata().getId()) || selected.getMetadata().getContact().get("homepage").isPresent());
 				super.drawButton(mc, var1, var2);
 			}
 		};
 		ButtonElement issuesButton = new ButtonElement(ISSUES_BUTTON_ID, rightPaneX + urlButtonWidths + 4 + (urlButtonWidths / 2) - (cappedButtonWidth / 2), paneY + 36, Math.min(urlButtonWidths, 200), 20, i18n.translateKey("modmenu.issues")) {
 			@Override
 			public void drawButton(Minecraft mc, int var1, int var2) {
-				visible = selected != null; // visible = selected != null
-				enabled = visible  && selected.getMetadata().getContact().get("issues").isPresent();
+				visible = selected != null;
+				enabled = visible && ("minecraft".equals(selected.getMetadata().getId()) ||  selected.getMetadata().getContact().get("issues").isPresent());
 				super.drawButton(mc, var1, var2);
 			}
 		};
@@ -210,11 +210,27 @@ public class ModListScreen extends Screen {
 				break;
 			}
 			case WEBSITE_BUTTON_ID: {
-				Objects.requireNonNull(selected).getMetadata().getContact().get("homepage").ifPresent(UrlHelper::openURL);
+				if (selected != null) {
+					String modId = selected.getMetadata().getId();
+
+					if ("minecraft".equals(modId)) {
+						UrlHelper.openURL("https://www.betterthanadventure.net/");
+					} else {
+						selected.getMetadata().getContact().get("homepage").ifPresent(UrlHelper::openURL);
+					}
+				}
 				break;
 			}
 			case ISSUES_BUTTON_ID: {
-				Objects.requireNonNull(selected).getMetadata().getContact().get("issues").ifPresent(UrlHelper::openURL);
+				if (selected != null) {
+					String modId = selected.getMetadata().getId();
+
+					if ("minecraft".equals(modId)) {
+						UrlHelper.openURL("https://support.betterthanadventure.net/");
+					} else {
+						selected.getMetadata().getContact().get("issues").ifPresent(UrlHelper::openURL);
+					}
+				}
 				break;
 			}
 			case TOGGLE_FILTER_OPTIONS_BUTTON_ID: {
