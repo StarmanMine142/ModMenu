@@ -22,12 +22,10 @@ import java.util.Random;
 public class MixinGuiMainMenu extends Screen {
 	@Inject(at = @At("RETURN"), method = "init")
 	public void modmenu$drawMenuButton(CallbackInfo info) {
-		ModMenuConfig config = ModMenuConfigManager.getConfig();
-
-		if (config.getModsButtonStyle() == ModMenuConfig.ModsButtonStyle.INSERT) {
-			I18n i18n = I18n.getInstance();
-			ButtonElement texturePackButton = this.buttons.get(2);
-			texturePackButton.displayString = new Random().nextInt(1000) == 0 ? "Twin Peaks" : i18n.translateKey("gui.main_menu.button.asset_packs");
+		ButtonElement texturePackButton = this.buttons.get(2);
+		I18n i18n = I18n.getInstance();
+		texturePackButton.displayString = new Random().nextInt(1000) == 0 ? "Twin Peaks" : i18n.translateKey("gui.main_menu.button.asset_packs");
+		if (ModMenuConfigManager.getConfig().getModsButtonStyle() == ModMenuConfig.ModsButtonStyle.INSERT) {
 			int newWidth = ((GuiButtonAccessor) texturePackButton).getWidth() / 2 - 1;
 			((GuiButtonAccessor) texturePackButton).setWidth(newWidth);
 			String buttonText = i18n.translateKey("modmenu.title") + " " + i18n.translateKeyAndFormat("modmenu.loaded", ModMenu.getFormattedModCount());

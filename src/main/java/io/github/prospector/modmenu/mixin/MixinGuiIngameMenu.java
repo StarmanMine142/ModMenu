@@ -20,8 +20,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class MixinGuiIngameMenu extends Screen {
 	@Inject(at = @At("RETURN"), method = "init")
 	public void modmenu$drawMenuButton(CallbackInfo info) {
-		ModMenuConfig config = ModMenuConfigManager.getConfig();
-		if (config.getGameMenuButtonStyle() == ModMenuConfig.GameMenuButtonStyle.INSERT) {
+		if (ModMenuConfigManager.getConfig().getGameMenuButtonStyle() == ModMenuConfig.GameMenuButtonStyle.INSERT) {
 			I18n i18n = I18n.getInstance();
 			String buttonText = i18n.translateKey("modmenu.title") + " " + i18n.translateKeyAndFormat("modmenu.loaded", ModMenu.getFormattedModCount());
 			this.buttons.add(new ModMenuButtonWidget(1000, this.width / 2 - 100, this.height / 4 + 72 - 16, 200, 20, buttonText));
