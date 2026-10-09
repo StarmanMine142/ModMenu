@@ -113,6 +113,9 @@ public class ModListScreen extends Screen {
 
 			@Override
 			public void render(Minecraft mc, int mouseX, int mouseY) {
+				if (isHovered(mouseX, mouseY)) {
+					setTooltip(i18n.translateKey("modmenu.configure"));
+				}
 				if (selected != null) {
 					String modid = selected.getMetadata().getId();
 					enabled = ModMenu.hasConfigScreenFactory(modid) || ModMenu.hasLegacyConfigScreenTask(modid);
