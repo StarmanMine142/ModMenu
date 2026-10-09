@@ -30,7 +30,7 @@ public class MixinI18n {
     )
     private void modmenu$addLangEntries(String languageCode, CallbackInfo ci) {
         Properties entries = ((LanguageAccessor) currentLanguage).getEntries();
-        String lang = "/lang/modmenu/" + currentLanguage.getId() + ".lang";
+        String lang = "/assets/modmenu/lang/" + currentLanguage.getId() + ".lang";
         try (InputStream stream = getResourceAsStream(lang)) {
             if (stream != null) {
                 InputStreamReader r = new InputStreamReader(stream, StandardCharsets.UTF_8);
@@ -39,7 +39,7 @@ public class MixinI18n {
         } catch (IOException e) {
             ModMenu.LOGGER.error("Failed to load {} language.", currentLanguage.getId(), e);
         }
-        String defaultLang = "/lang/modmenu/en_US.lang";
+        String defaultLang = "/assets/modmenu/lang/en_US.lang";
         try (InputStream stream = getResourceAsStream(defaultLang)) {
             if (stream != null) {
                 InputStreamReader r = new InputStreamReader(stream, StandardCharsets.UTF_8);
