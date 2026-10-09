@@ -8,8 +8,12 @@ import java.util.Comparator;
 public class ModMenuConfig {
 	private boolean showLibraries = false;
 	private Sorting sorting = Sorting.ASCENDING;
+	private boolean hideBadges = true;
+	private boolean easterEggs = true;
 	private GameMenuButtonStyle gameMenuButtonStyle = GameMenuButtonStyle.INSERT;
 	private ModsButtonStyle modsButtonStyle = ModsButtonStyle.INSERT;
+	private boolean translateNames = true;
+	private boolean translateDescriptions = true;
 
 	public void toggleShowLibraries() {
 		this.showLibraries = !this.showLibraries;
@@ -17,17 +21,37 @@ public class ModMenuConfig {
 	}
 
 	public void toggleSortMode() {
-		this.sorting = Sorting.values()[(sorting.ordinal() + 1) % Sorting.values().length];
+		this.sorting = next(this.sorting);
+		ModMenuConfigManager.save();
+	}
+
+	public void toggleHideBadges() {
+		this.hideBadges = !this.hideBadges;
+		ModMenuConfigManager.save();
+	}
+
+	public void toggleEasterEggs() {
+		this.easterEggs = !this.easterEggs;
 		ModMenuConfigManager.save();
 	}
 
 	public void toggleGameMenuButtonStyle() {
-		this.gameMenuButtonStyle = GameMenuButtonStyle.values()[(gameMenuButtonStyle.ordinal() + 1) % GameMenuButtonStyle.values().length];
+		this.gameMenuButtonStyle = next(this.gameMenuButtonStyle);
 		ModMenuConfigManager.save();
 	}
 
 	public void toggleModsButtonStyle() {
-		this.modsButtonStyle = ModsButtonStyle.values()[(modsButtonStyle.ordinal() + 1) % ModsButtonStyle.values().length];
+		this.modsButtonStyle = next(this.modsButtonStyle);
+		ModMenuConfigManager.save();
+	}
+
+	public void toggleTranslateNames() {
+		this.translateNames = !this.translateNames;
+		ModMenuConfigManager.save();
+	}
+
+	public void toggleTranslateDescriptions() {
+		this.translateDescriptions = !this.translateDescriptions;
 		ModMenuConfigManager.save();
 	}
 
@@ -39,6 +63,14 @@ public class ModMenuConfig {
 		return sorting;
 	}
 
+	public boolean getHideBadges() {
+		return hideBadges;
+	}
+
+	public boolean getEasterEggs() {
+		return easterEggs;
+	}
+
 	public GameMenuButtonStyle getGameMenuButtonStyle() {
 		return gameMenuButtonStyle;
 	}
@@ -47,29 +79,64 @@ public class ModMenuConfig {
 		return modsButtonStyle;
 	}
 
+	public boolean getTranslateNames() {
+		return translateNames;
+	}
+
+	public boolean getTranslateDescriptions() {
+		return translateDescriptions;
+	}
+
 	public String getSortingDisplayString() {
-		I18n i18n = I18n.getInstance();
-		return i18n.translateKey("option.modmenu.sorting") + ": " + this.sorting.getName();
+		return optionString("sorting", this.sorting.getName());
 	}
 
 	public String getShowLibrariesDisplayString() {
-		I18n i18n = I18n.getInstance();
-		String librariesValueKey = this.showLibraries ? "option.modmenu.show_libraries.true" : "option.modmenu.show_libraries.false";
-		return i18n.translateKey("option.modmenu.show_libraries") + ": " + i18n.translateKey(librariesValueKey);
+		return optionString("show_libraries", I18n.getInstance().translateKey("option.modmenu.show_libraries." + this.showLibraries));
+	}
+
+	public String getHideBadgesDisplayString() {
+		return optionString("hide_badges", I18n.getInstance().translateKey("option.modmenu.hide_badges." + this.hideBadges));
+	}
+
+	public String getEasterEggsDisplayString() {
+		return optionString("easter_eggs", I18n.getInstance().translateKey("option.modmenu.easter_eggs." + this.easterEggs));
 	}
 
 	public String getModsButtonStyleDisplayString() {
-		I18n i18n = I18n.getInstance();
-		return i18n.translateKey("option.modmenu.mods_button_style") + ": " + this.modsButtonStyle.getName();
+		return optionString("mods_button_style", this.modsButtonStyle.getName());
 	}
 
 	public String getGameMenuButtonStyleDisplayString() {
-		I18n i18n = I18n.getInstance();
-		return i18n.translateKey("option.modmenu.game_menu_button_style") + ": " + this.gameMenuButtonStyle.getName();
+		return optionString("game_menu_button_style", this.gameMenuButtonStyle.getName());
 	}
 
-	public enum Sorting {
-		ASCENDING(Comparator.comparing(modContainer -> modContainer.getMetadata().getName(), String.CASE_INSENSITIVE_ORDER), "option.modmenu.sorting.ascending"),
+	public String getTranslateNamesDisplayString() {
+		return optionString("translate_names", I18n.getInstance().translateKey("option.modmenu.translate_names." + this.translateNames));
+	}
+
+	public String getTranslateDescriptionsDisplayString() {
+		return optionString("translate_descriptions", I18n.getInstance().translateKey("option.modmenu.translate_descriptions." + this.translateDescriptions));
+	}
+
+	private static <T extends Enum<T>> T next(T current) {
+		T[] values = current.getDeclaringClass().getEnumConstants();
+		return values[(current.ordinal() + 1) % values.length];
+	}
+
+	private static String optionString(String optionKey, String valueName) {
+		return I18n.getInstance().translateKey("option.modmenu." + optionKey) + ": " + valueName;
+	}
+
+	private interface OptionEnum {
+		String getKey();
+		default String getName() {
+			return I18n.getInstance().translateKey(getKey());
+		}
+	}
+
+	public enum Sorting implements OptionEnum {
+		ASCENDING(Comparator.comparing(mod -> mod.getMetadata().getName(), String.CASE_INSENSITIVE_ORDER), "option.modmenu.sorting.ascending"),
 		DESCENDING(ASCENDING.getComparator().reversed(), "option.modmenu.sorting.descending");
 
 		final Comparator<ModContainer> comparator;
@@ -84,12 +151,13 @@ public class ModMenuConfig {
 			return comparator;
 		}
 
-		public String getName() {
-			return I18n.getInstance().translateKey(key);
+		@Override
+		public String getKey() {
+			return key;
 		}
 	}
 
-	public enum ModsButtonStyle {
+	public enum ModsButtonStyle implements OptionEnum {
 		INSERT("option.modmenu.mods_button_style.insert"),
 		ICON("option.modmenu.mods_button_style.icon");
 
@@ -99,12 +167,13 @@ public class ModMenuConfig {
 			this.key = key;
 		}
 
-		public String getName() {
-			return I18n.getInstance().translateKey(key);
+		@Override
+		public String getKey() {
+			return key;
 		}
 	}
 
-	public enum GameMenuButtonStyle {
+	public enum GameMenuButtonStyle implements OptionEnum {
 		INSERT("option.modmenu.game_menu_button_style.insert"),
 		ICON("option.modmenu.game_menu_button_style.icon");
 
@@ -114,8 +183,9 @@ public class ModMenuConfig {
 			this.key = key;
 		}
 
-		public String getName() {
-			return I18n.getInstance().translateKey(key);
+		@Override
+		public String getKey() {
+			return key;
 		}
 	}
 }

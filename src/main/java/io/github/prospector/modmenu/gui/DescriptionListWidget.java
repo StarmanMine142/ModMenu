@@ -1,6 +1,7 @@
 package io.github.prospector.modmenu.gui;
 
 
+import io.github.prospector.modmenu.config.ModMenuConfigManager;
 import io.github.prospector.modmenu.util.RenderUtils;
 import net.fabricmc.loader.api.metadata.ContactInformation;
 import net.fabricmc.loader.api.metadata.Person;
@@ -114,7 +115,7 @@ public class DescriptionListWidget extends EntryListWidget<DescriptionListWidget
 			String translatedDesc = i18n.translateKey(descKey);
 
 			String description;
-			if (!translatedDesc.equals(descKey)) {
+			if (!translatedDesc.equals(descKey) && ModMenuConfigManager.getConfig().getTranslateDescriptions()) {
 				description = translatedDesc;
 			} else {
 				description = selectedEntry.getMetadata().getDescription();

@@ -354,7 +354,7 @@ public class ModListScreen extends Screen {
 			String translationKey = "modmenu.nameTranslation." + id;
 			String translatedName = i18n.translateKey(translationKey);
 			String name;
-			if (!translatedName.equals(translationKey)) {
+			if (!translatedName.equals(translationKey) && ModMenuConfigManager.getConfig().getTranslateNames()) {
 				name = translatedName;
 			} else {
 				name = metadata.getName();

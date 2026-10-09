@@ -2,6 +2,8 @@ package io.github.prospector.modmenu.util;
 
 
 import io.github.prospector.modmenu.ModMenu;
+import io.github.prospector.modmenu.config.ModMenuConfig;
+import io.github.prospector.modmenu.config.ModMenuConfigManager;
 import io.github.prospector.modmenu.gui.ModListScreen;
 import net.fabricmc.loader.api.ModContainer;
 import net.fabricmc.loader.api.metadata.ModMetadata;
@@ -53,23 +55,27 @@ public class BadgeRenderer {
                 drawBadge(entry.getKey(), entry.getValue().getKey(), entry.getValue().getValue(), mouseX, mouseY);
             }
         }
-		//noinspection MagicConstant
-		if (Calendar.getInstance().get(0b10) == 0b11 && Calendar.getInstance().get(0b101) == 0x1) {
-			if (metadata.getId().equals(new String(new byte[]{109, 111, 100, 109, 101, 110, 117}))) {
-				drawBadge(new String(new byte[]{-30, -100, -104, 32, 86, 105, 114, 117, 115, 32, 68, 101, 116, 101, 99, 116, 101, 100}), 0b10001000111111110010001000100010, 0b10001000011111110000100000001000, mouseX, mouseY);
-			} else if (metadata.getId().contains(new String(new byte[]{116, 97, 116, 101, 114}))) {
-				drawBadge(new String(new byte[]{116, 97, 116, 101, 114}), 0b10001000111010111011001100101011, 0b10001000100110010111000100010010, mouseX, mouseY);
-			} else {
-				drawBadge(new String(new byte[]{-30, -100, -108, 32, 98, 121, 32, 77, 99, 65, 102, 101, 101}), 0b10001000000111011111111101001000, 0b10001000000001110110100100001110, mouseX, mouseY);
+		if (ModMenuConfigManager.getConfig().getEasterEggs()) {
+			//noinspection MagicConstant
+			if (Calendar.getInstance().get(0b10) == 0b11 && Calendar.getInstance().get(0b101) == 0x1) {
+				if (metadata.getId().equals(new String(new byte[]{109, 111, 100, 109, 101, 110, 117}))) {
+					drawBadge(new String(new byte[]{-30, -100, -104, 32, 86, 105, 114, 117, 115, 32, 68, 101, 116, 101, 99, 116, 101, 100}), 0b10001000111111110010001000100010, 0b10001000011111110000100000001000, mouseX, mouseY);
+				} else if (metadata.getId().contains(new String(new byte[]{116, 97, 116, 101, 114}))) {
+					drawBadge(new String(new byte[]{116, 97, 116, 101, 114}), 0b10001000111010111011001100101011, 0b10001000100110010111000100010010, mouseX, mouseY);
+				} else {
+					drawBadge(new String(new byte[]{-30, -100, -108, 32, 98, 121, 32, 77, 99, 65, 102, 101, 101}), 0b10001000000111011111111101001000, 0b10001000000001110110100100001110, mouseX, mouseY);
+				}
 			}
 		}
 	}
 
 	public void drawBadge(String text, int outlineColor, int fillColor, int mouseX, int mouseY) {
-		int width = client.font.stringWidth(text) + 6;
-		if (badgeX + width < badgeMax) {
-			RenderUtils.INSTANCE.drawBadge(screen, badgeX, badgeY, width, text, outlineColor, fillColor, 0xCACACA);
-			badgeX += width + 3;
+		if (!ModMenuConfigManager.getConfig().getHideBadges()) {
+			int width = client.font.stringWidth(text) + 6;
+			if (badgeX + width < badgeMax) {
+				RenderUtils.INSTANCE.drawBadge(screen, badgeX, badgeY, width, text, outlineColor, fillColor, 0xCACACA);
+				badgeX += width + 3;
+			}
 		}
 	}
 

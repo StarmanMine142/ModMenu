@@ -2,6 +2,8 @@ package io.github.prospector.modmenu.util;
 
 
 import io.github.prospector.modmenu.ModMenu;
+import io.github.prospector.modmenu.config.ModMenuConfig;
+import io.github.prospector.modmenu.config.ModMenuConfigManager;
 import io.github.prospector.modmenu.gui.ModListScreen;
 import net.fabricmc.loader.api.ModContainer;
 import net.fabricmc.loader.api.metadata.ModMetadata;
@@ -34,14 +36,15 @@ public final class ModListSearch {
 
 		//Some basic search, could do with something more advanced but this will do for now
 		I18n i18n = I18n.getInstance();
+		ModMenuConfig config = ModMenuConfigManager.getConfig();
 
 		String nameTranslation = "modmenu.nameTranslation." + modId;
 		String translatedName = i18n.translateKey(nameTranslation);
-		String modName = !translatedName.equals(nameTranslation) ? translatedName : metadata.getName();
+		String modName = !translatedName.equals(nameTranslation) && config.getTranslateNames() ? translatedName : metadata.getName();
 
 		String descriptionTranslation = "modmenu.descriptionTranslation." + modId;
 		String translatedDescription = i18n.translateKey(descriptionTranslation);
-		String modDescription = !translatedDescription.equals(descriptionTranslation) ? translatedDescription : metadata.getDescription();
+		String modDescription = !translatedDescription.equals(descriptionTranslation) && config.getTranslateDescriptions() ? translatedDescription : metadata.getDescription();
 
 		if (modName.toLowerCase(Locale.ROOT).contains(query) // Search mod name
 				|| modDescription.toLowerCase(Locale.ROOT).contains(query) // Search mod description

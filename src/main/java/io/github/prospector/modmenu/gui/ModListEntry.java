@@ -2,6 +2,8 @@ package io.github.prospector.modmenu.gui;
 
 
 import io.github.prospector.modmenu.ModMenu;
+import io.github.prospector.modmenu.config.ModMenuConfig;
+import io.github.prospector.modmenu.config.ModMenuConfigManager;
 import io.github.prospector.modmenu.util.BadgeRenderer;
 import io.github.prospector.modmenu.util.RenderUtils;
 import net.fabricmc.loader.api.FabricLoader;
@@ -45,6 +47,8 @@ public class ModListEntry extends AlwaysSelectedEntryListWidget.Entry<ModListEnt
 	@Override
 	public void render(int index, int y, int x, int rowWidth, int rowHeight, int mouseX, int mouseY, boolean isSelected, float delta) {
 		I18n i18n = I18n.getInstance();
+		ModMenuConfig config = ModMenuConfigManager.getConfig();
+
 		x += getXOffset();
 		rowWidth -= getXOffset();
 
@@ -52,13 +56,13 @@ public class ModListEntry extends AlwaysSelectedEntryListWidget.Entry<ModListEnt
 
 		GLRenderer.setColor4f(1, 1, 1, 1); // We LOVE random color calls
 		this.bindIconTexture();
-        internalRender(y, x);
+		internalRender(y, x);
 
 		String id = metadata.getId();
 		String translationKey = "modmenu.nameTranslation." + id;
 		String translatedName = i18n.translateKey(translationKey);
 		String name;
-		if (!translatedName.equals(translationKey)) {
+		if (!translatedName.equals(translationKey) && config.getTranslateNames()) {
 			name = translatedName;
 		} else {
 			name = metadata.getName();
@@ -66,14 +70,14 @@ public class ModListEntry extends AlwaysSelectedEntryListWidget.Entry<ModListEnt
 		String trimmedName = name;
 		int maxNameWidth = rowWidth - 32 - 3;
 		FontRenderer font = this.fontRenderer;
-        trimmedName = ModListScreen.getString(fontRenderer, name, trimmedName, maxNameWidth);
-        this.drawStringNoShadow(font, trimmedName, x + 32 + 3, y + 1, 0xFFFFFF);
+		trimmedName = ModListScreen.getString(fontRenderer, name, trimmedName, maxNameWidth);
+		this.drawStringNoShadow(font, trimmedName, x + 32 + 3, y + 1, 0xFFFFFF);
 		new BadgeRenderer(client, x + 32 + 3 + font.stringWidth(name) + 2, y, x + rowWidth, container, list.getParent()).draw(mouseX, mouseY);
 
 		String descKey = "modmenu.descriptionTranslation." + id;
 		String translatedDesc = i18n.translateKey(descKey);
 		String description;
-		if (!translatedDesc.equals(descKey)) {
+		if (!translatedDesc.equals(descKey) && config.getTranslateDescriptions()) {
 			description = translatedDesc;
 		} else {
 			description = metadata.getDescription();
@@ -91,16 +95,16 @@ public class ModListEntry extends AlwaysSelectedEntryListWidget.Entry<ModListEnt
 			int maxWidth = rowWidth - 32 - 7;
 			int maxLines = 2;
 			int currentLine = 0;
-			
-            font = this.fontRenderer;
+
+			font = this.fontRenderer;
 			String[] paragraphs = description.split("\r?\n");
-			
+
 			for (String paragraph : paragraphs) {
 				if (currentLine >= maxLines) break;
-				
+
 				for (String line : RenderUtils.INSTANCE.wrapStringToWidthAsList(font, paragraph, maxWidth)) {
 					if (currentLine >= maxLines) break;
-					
+
 					this.drawStringNoShadow(font, line, textX, textY + (currentLine * 9), 0x808080);
 					currentLine++;
 				}
@@ -110,7 +114,7 @@ public class ModListEntry extends AlwaysSelectedEntryListWidget.Entry<ModListEnt
 		GLRenderer.popFrame();
 	}
 
-    static void internalRender(int y, int x) {
+	static void internalRender(int y, int x) {
 		GLRenderer.pushFrame();
 		GLRenderer.setShader(Shaders.INTERFACE);
 		GLRenderer.enableState(State.BLEND);
@@ -124,9 +128,9 @@ public class ModListEntry extends AlwaysSelectedEntryListWidget.Entry<ModListEnt
 		t.draw();
 
 		GLRenderer.popFrame();
-    }
+	}
 
-    private BufferedImage createIcon() {
+	private BufferedImage createIcon() {
 		try {
 			Path path = container.getPath(metadata.getIconPath(0).orElse("assets/" + metadata.getId() + "/icon.png"));
 			BufferedImage cached = this.list.getCachedModIcon(path);
@@ -140,8 +144,8 @@ public class ModListEntry extends AlwaysSelectedEntryListWidget.Entry<ModListEnt
 				} else if (metadata.getId().equals("java")) {
 					path = modMenu.getPath("assets/" + ModMenu.MOD_ID + "/java_icon.png");
 				} else {
-                    path = modMenu.getPath("assets/" + ModMenu.MOD_ID + "/grey_fabric_icon.png");
-                }
+					path = modMenu.getPath("assets/" + ModMenu.MOD_ID + "/grey_fabric_icon.png");
+				}
 			}
 			cached = this.list.getCachedModIcon(path);
 			if (cached != null) {

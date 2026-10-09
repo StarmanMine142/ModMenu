@@ -64,6 +64,42 @@ public class ModMenuConfigScreen extends Screen {
                 config.getGameMenuButtonStyleDisplayString()
         ));
 
+        this.add(new ButtonElement(
+                104,
+                leftX,
+                startY + 48,
+                buttonWidth,
+                buttonHeight,
+                config.getHideBadgesDisplayString()
+        ));
+
+        this.add(new ButtonElement(
+                105,
+                rightX,
+                startY + 48,
+                buttonWidth,
+                buttonHeight,
+                config.getEasterEggsDisplayString()
+        ));
+
+        this.add(new ButtonElement(
+                106,
+                leftX,
+                startY + 72,
+                buttonWidth,
+                buttonHeight,
+                config.getTranslateNamesDisplayString()
+        ));
+
+        this.add(new ButtonElement(
+                107,
+                rightX,
+                startY + 72,
+                buttonWidth,
+                buttonHeight,
+                config.getTranslateDescriptionsDisplayString()
+        ));
+
         int doneButtonWidth = 200;
         this.add(new ButtonElement(
                 200,
@@ -101,6 +137,18 @@ public class ModMenuConfigScreen extends Screen {
         } else if (button.id == 103) {
             config.toggleGameMenuButtonStyle();
             button.displayString = config.getGameMenuButtonStyleDisplayString();
+        } else if (button.id == 104) {
+            config.toggleHideBadges();
+            button.displayString = config.getHideBadgesDisplayString();
+        } else if (button.id == 105) {
+            config.toggleEasterEggs();
+            button.displayString = config.getEasterEggsDisplayString();
+        } else if (button.id == 106) {
+            config.toggleTranslateNames();
+            button.displayString = config.getTranslateNamesDisplayString();
+        } else if (button.id == 107) {
+            config.toggleTranslateDescriptions();
+            button.displayString = config.getTranslateDescriptionsDisplayString();
         } else if (button.id == 200) {
             this.closeAndReturn();
         }
