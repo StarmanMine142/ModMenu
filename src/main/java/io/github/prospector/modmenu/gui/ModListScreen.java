@@ -190,7 +190,7 @@ public class ModListScreen extends Screen {
 		this.buttons.add(websiteButton);
 		this.buttons.add(issuesButton);
 		this.buttons.add(ButtonUtil.createButton(MODS_FOLDER_BUTTON_ID, this.width / 2 - 154, this.height - 28, 150, 20, i18n.translateKey("modmenu.modsFolder")));
-		this.buttons.add(ButtonUtil.createButton(DONE_BUTTON_ID, this.width / 2 + 4, this.height - 28, 150, 20, i18n.translateKey("modmenu.done")));
+		this.buttons.add(ButtonUtil.createButton(DONE_BUTTON_ID, this.width / 2 + 4, this.height - 28, 150, 20, i18n.translateKey("gui.options.button.done")));
 		this.searchBox.setFocused(true);
 
 		init = true;
