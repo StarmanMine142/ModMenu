@@ -122,7 +122,7 @@ public class ModListScreen extends Screen {
 				} else {
 					enabled = false;
 				}
-				visible = enabled; // visible = enabled
+				visible = enabled;
 
 				int prevColor = GLRenderer.getColor();
 				GLRenderer.setColor4f(1, 1, 1, 1);
@@ -157,8 +157,8 @@ public class ModListScreen extends Screen {
 				}
 			}
 		});
-		String showLibrariesText = i18n.translateKeyAndFormat("modmenu.showLibraries", i18n.translateKey("modmenu.showLibraries." + ModMenuConfigManager.getConfig().showLibraries()));
-		String sortingText = i18n.translateKeyAndFormat("modmenu.sorting", ModMenuConfigManager.getConfig().getSorting().getName());
+		String showLibrariesText = ModMenuConfigManager.getConfig().getShowLibrariesDisplayString();
+		String sortingText = ModMenuConfigManager.getConfig().getSortingDisplayString();
 		int showLibrariesWidth = fontRenderer.stringWidth(showLibrariesText) + 20;
 		int sortingWidth = fontRenderer.stringWidth(sortingText) + 20;
 		int filtersX;
@@ -174,7 +174,7 @@ public class ModListScreen extends Screen {
 			@Override
 			public void drawButton(Minecraft mc, int mouseX, int mouseY) {
 				visible = enabled = filterOptionsShown;
-				this.displayString = i18n.translateKeyAndFormat("modmenu.sorting", ModMenuConfigManager.getConfig().getSorting().getName());
+				this.displayString = ModMenuConfigManager.getConfig().getSortingDisplayString();
 				super.drawButton(mc, mouseX, mouseY);
 			}
 		});
@@ -182,7 +182,7 @@ public class ModListScreen extends Screen {
 			@Override
 			public void drawButton(Minecraft mc, int mouseX, int mouseY) {
 				visible = enabled = filterOptionsShown;
-				this.displayString = i18n.translateKeyAndFormat("modmenu.showLibraries", i18n.translateKey("modmenu.showLibraries." + ModMenuConfigManager.getConfig().showLibraries()));
+				this.displayString = ModMenuConfigManager.getConfig().getShowLibrariesDisplayString();
 				super.drawButton(mc, mouseX, mouseY);
 			}
 		});
