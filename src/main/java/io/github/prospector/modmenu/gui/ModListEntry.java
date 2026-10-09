@@ -144,7 +144,7 @@ public class ModListEntry extends AlwaysSelectedEntryListWidget.Entry<ModListEnt
 				} else if (metadata.getId().equals("java")) {
 					path = modMenu.getPath("assets/" + ModMenu.MOD_ID + "/java_icon.png");
 				} else {
-					path = modMenu.getPath("assets/" + ModMenu.MOD_ID + "/grey_fabric_icon.png");
+					path = modMenu.getPath("assets/" + ModMenu.MOD_ID + "/unknown_icon.png");
 				}
 			}
 			cached = this.list.getCachedModIcon(path);
