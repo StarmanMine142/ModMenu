@@ -8,8 +8,6 @@ modmenu.modIdToolTip=Mod ID: %s
 modmenu.website=Website
 modmenu.issues=Issues
 modmenu.authorPrefix=By %s
-modmenu.authors=Authors:
-modmenu.contributors=Contributors:
 modmenu.licenses=License:
 modmenu.search=Search for mods
 modmenu.toggleFilterOptions=Toggle Filter Options
@@ -20,6 +18,10 @@ modmenu.showingMods=Showing %s Mods
 modmenu.sorting=Sort: %s
 modmenu.sorting.ascending=A-Z
 modmenu.sorting.descending=Z-A
+
+modmenu.credits=Credits:
+modmenu.authors=Authors:
+modmenu.contributors=Contributors:
 
 modmenu.searchTerms.library=api library
 modmenu.searchTerms.clientside=clientside gameside
