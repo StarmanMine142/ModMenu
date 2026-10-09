@@ -113,22 +113,6 @@ public class DescriptionListWidget extends EntryListWidget<DescriptionListWidget
 			Collection<Person> contributors = selectedEntry.getMetadata().getContributors();
 			Collection<String> licenses = selectedEntry.getMetadata().getLicense();
 
-            if (!authors.isEmpty()) {
-                if (!children().isEmpty()) children().add(new DescriptionEntry(""));
-                children().add(new DescriptionEntry(i18n.translateKey("modmenu.authors")));
-                for (Person person : authors) {
-                    children().add(new DescriptionEntry("    " + person.getName()));
-                }
-            }
-
-            if (!contributors.isEmpty()) {
-                if (!children().isEmpty()) children().add(new DescriptionEntry(""));
-                children().add(new DescriptionEntry(i18n.translateKey("modmenu.contributors")));
-                for (Person person : contributors) {
-                    children().add(new DescriptionEntry("    " + person.getName()));
-                }
-            }
-
 			ContactInformation contact = selectedEntry.getMetadata().getContact();
 			Map<String, String> links = new HashMap<>(contact.asMap());
 
@@ -158,13 +142,33 @@ public class DescriptionListWidget extends EntryListWidget<DescriptionListWidget
 				});
 			}
 
-            if (!licenses.isEmpty()) {
-                if (!children().isEmpty()) children().add(new DescriptionEntry(""));
-                children().add(new DescriptionEntry(i18n.translateKey("modmenu.licenses")));
-                for (String license : licenses) {
-                    children().add(new DescriptionEntry("    " + license));
-                }
-            }
+			if (!licenses.isEmpty()) {
+				if (!children().isEmpty()) children().add(new DescriptionEntry(""));
+				children().add(new DescriptionEntry(i18n.translateKey("modmenu.licenses")));
+				for (String license : licenses) {
+					children().add(new DescriptionEntry("    " + license));
+				}
+			}
+
+			if (!authors.isEmpty() || !contributors.isEmpty()) {
+				if (!children().isEmpty()) children().add(new DescriptionEntry(""));
+
+				children().add(new DescriptionEntry(i18n.translateKey("modmenu.credits")));
+
+				if (!authors.isEmpty()) {
+					children().add(new DescriptionEntry("  " + i18n.translateKey("modmenu.authors")));
+					for (Person person : authors) {
+						children().add(new DescriptionEntry("    " + person.getName()));
+					}
+				}
+
+				if (!contributors.isEmpty()) {
+					children().add(new DescriptionEntry("  " + i18n.translateKey("modmenu.contributors")));
+					for (Person person : contributors) {
+						children().add(new DescriptionEntry("    " + person.getName()));
+					}
+				}
+			}
 		}
 		super.render(mouseX, mouseY, delta);
 	}
