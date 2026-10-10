@@ -16,7 +16,6 @@ public class ModMenuConfigScreen extends Screen {
 
     @Override
     public void init() {
-        I18n i18n = I18n.getInstance();
         ModMenuConfig config = ModMenuConfigManager.getConfig();
 
         int buttonWidth = 150;
@@ -162,7 +161,7 @@ public class ModMenuConfigScreen extends Screen {
                 this.height - 28,
                 doneButtonWidth,
                 buttonHeight,
-                i18n.translateKey("gui.options.button.done")
+                I18n.getInstance().translateKey("gui.options.button.done")
         ));
     }
 
@@ -170,8 +169,7 @@ public class ModMenuConfigScreen extends Screen {
     public void render(int mouseX, int mouseY, float delta) {
         this.renderBackground();
 
-        I18n i18n = I18n.getInstance();
-        this.drawStringCenteredNoShadow(this.fontRenderer, i18n.translateKey("modmenu.options"), this.width / 2, 20, 0xFFFFFF);
+        this.drawStringCenteredNoShadow(this.fontRenderer, I18n.getInstance().translateKey("modmenu.options"), this.width / 2, 20, 0xFFFFFF);
 
         super.render(mouseX, mouseY, delta);
     }
