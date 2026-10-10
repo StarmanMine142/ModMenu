@@ -1,6 +1,5 @@
 package io.github.prospector.modmenu.util;
 
-
 import io.github.prospector.modmenu.ModMenu;
 import io.github.prospector.modmenu.config.ModMenuConfig;
 import io.github.prospector.modmenu.config.ModMenuConfigManager;
@@ -19,6 +18,8 @@ public class BadgeRenderer {
 	protected ModMetadata metadata;
 	protected Minecraft client;
 	protected final ModListScreen screen;
+
+	ModMenuConfig config = ModMenuConfigManager.getConfig();
 
 	public BadgeRenderer(Minecraft client, int startX, int startY, int endX, ModContainer container, ModListScreen screen) {
 		this.startX = startX;
@@ -55,7 +56,7 @@ public class BadgeRenderer {
                 drawBadge(entry.getKey(), entry.getValue().getKey(), entry.getValue().getValue(), mouseX, mouseY);
             }
         }
-		if (ModMenuConfigManager.getConfig().getEasterEggs()) {
+		if (config.getEasterEggs()) {
 			//noinspection MagicConstant
 			if (Calendar.getInstance().get(0b10) == 0b11 && Calendar.getInstance().get(0b101) == 0x1) {
 				if (metadata.getId().equals(new String(new byte[]{109, 111, 100, 109, 101, 110, 117}))) {
@@ -70,7 +71,7 @@ public class BadgeRenderer {
 	}
 
 	public void drawBadge(String text, int outlineColor, int fillColor, int mouseX, int mouseY) {
-		if (!ModMenuConfigManager.getConfig().getHideBadges()) {
+		if (!config.getHideBadges()) {
 			int width = client.font.stringWidth(text) + 6;
 			if (badgeX + width < badgeMax) {
 				RenderUtils.INSTANCE.drawBadge(screen, badgeX, badgeY, width, text, outlineColor, fillColor, 0xCACACA);

@@ -1,6 +1,5 @@
 package io.github.prospector.modmenu.gui;
 
-
 import io.github.prospector.modmenu.ModMenu;
 import io.github.prospector.modmenu.config.ModMenuConfig;
 import io.github.prospector.modmenu.config.ModMenuConfigManager;
@@ -12,11 +11,13 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
 import net.fabricmc.loader.api.metadata.ModMetadata;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Screen;
 import net.minecraft.client.render.font.FontRenderer;
 import net.minecraft.client.render.renderer.GLRenderer;
 import net.minecraft.client.render.renderer.Shaders;
 import net.minecraft.client.render.renderer.State;
 import net.minecraft.client.render.tessellator.TessellatorGeneral;
+import net.minecraft.client.render.window.CursorShape;
 import net.minecraft.core.lang.I18n;
 import org.lwjgl.opengl.GL11;
 import org.slf4j.Logger;
@@ -30,7 +31,7 @@ import java.nio.file.Path;
 import java.util.Objects;
 
 public class ModListEntry extends AlwaysSelectedEntryListWidget.Entry<ModListEntry> {
-	public static final String UNKNOWN_ICON = "/gui/unknown_pack.png";
+	public static final String UNKNOWN_ICON = "/assets/modmenu/unknown_icon.png";
 	private static final Logger LOGGER = LoggerFactory.getLogger(ModMenu.MOD_ID);
 
 	protected final Minecraft client;
@@ -38,8 +39,7 @@ public class ModListEntry extends AlwaysSelectedEntryListWidget.Entry<ModListEnt
 	protected final ModMetadata metadata;
 	protected final ModListWidget list;
 	protected Integer iconLocation;
-	private int lastRenderX;
-	private int lastRenderY;
+
 	ModMenuConfig config = ModMenuConfigManager.getConfig();
 
 	public ModListEntry(Minecraft mc, ModContainer container, ModListWidget list) {
@@ -67,9 +67,6 @@ public class ModListEntry extends AlwaysSelectedEntryListWidget.Entry<ModListEnt
 
 		this.bindIconTexture();
 		internalRender(y, x);
-
-		this.lastRenderX = x;
-		this.lastRenderY = y;
 
 		if (!(this instanceof ParentEntry) && (ModMenu.hasConfigScreenFactory(id) || ModMenu.hasLegacyConfigScreenTask(id)) && config.getQuickConfigure()) {
 			int iconSize = 32;
@@ -112,7 +109,7 @@ public class ModListEntry extends AlwaysSelectedEntryListWidget.Entry<ModListEnt
 				GLRenderer.popFrame();
 
 				if (hoveringIcon) {
-					list.getParent().setDesiredCursor(net.minecraft.client.render.window.CursorShape.HAND);
+					list.getParent().setDesiredCursor(CursorShape.HAND);
 				}
 			}
 		}
@@ -154,7 +151,7 @@ public class ModListEntry extends AlwaysSelectedEntryListWidget.Entry<ModListEnt
 			int maxLines = 2;
 			int currentLine = 0;
 
-			font = this.fontRenderer;
+
 			String[] paragraphs = description.split("\r?\n");
 
 			for (String paragraph : paragraphs) {
@@ -232,7 +229,7 @@ public class ModListEntry extends AlwaysSelectedEntryListWidget.Entry<ModListEnt
 			if (ModMenu.hasConfigScreenFactory(id) || ModMenu.hasLegacyConfigScreenTask(id) && config.getQuickConfigure()) {
 				int iconLeft = getXOffset();
 				if (v >= iconLeft && v < iconLeft + 32 && v1 >= 0 && v1 < 32) {
-					final net.minecraft.client.gui.Screen screen = ModMenu.getConfigScreen(id, list.getParent());
+					final Screen screen = ModMenu.getConfigScreen(id, list.getParent());
 					if (screen != null) {
 						client.displayScreen(screen);
 					} else {

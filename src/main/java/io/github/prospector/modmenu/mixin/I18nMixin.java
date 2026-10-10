@@ -16,7 +16,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Properties;
 
 @Mixin(value = I18n.class, remap = false)
-public class MixinI18n {
+public class I18nMixin {
     @Shadow private Language currentLanguage;
 
     @Shadow
@@ -24,10 +24,7 @@ public class MixinI18n {
         throw new AssertionError();
     }
 
-    @Inject(
-            method = "reload",
-            at = @At("TAIL")
-    )
+    @Inject(method = "reload", at = @At("TAIL"))
     private void modmenu$addLangEntries(String languageCode, CallbackInfo ci) {
         Properties entries = ((LanguageAccessor) currentLanguage).getEntries();
         String lang = "/assets/modmenu/lang/" + currentLanguage.getId() + ".lang";

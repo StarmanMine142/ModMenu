@@ -1,6 +1,5 @@
 package io.github.prospector.modmenu.util;
 
-
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
 import net.fabricmc.loader.api.SemanticVersion;
@@ -214,7 +213,7 @@ public class TestModContainer implements ModContainer {
 			return new HashMap<>();
 		}
 
-		@Override
+        @Override
         public boolean containsCustomElement(String key) {
             return false;
         }

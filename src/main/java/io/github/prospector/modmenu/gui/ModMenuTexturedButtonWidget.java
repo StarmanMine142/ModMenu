@@ -1,6 +1,5 @@
 package io.github.prospector.modmenu.gui;
 
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ButtonElement;
 import net.minecraft.client.render.font.FontRenderer;
@@ -55,7 +54,7 @@ public class ModMenuTexturedButtonWidget extends ButtonElement {
 			if (hovered && mc.currentScreen != null && this.enabled) {
 				mc.currentScreen.setDesiredCursor(CursorShape.HAND);
 			}
-			
+
 			int adjustedV = this.v;
 			if (!enabled) {
 				adjustedV += this.height * 2;

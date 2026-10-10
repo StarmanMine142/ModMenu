@@ -1,6 +1,5 @@
 package io.github.prospector.modmenu;
 
-
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -131,7 +130,6 @@ public class ModMenu implements ModInitializer {
 
 			// Hardcode marking as library
 			if (id.equals("fabricloader")
-					|| id.equals("fabric")
 					|| id.equals("java")
 					|| id.equals("mixinextras")) {
 				addLibraryMod(id);

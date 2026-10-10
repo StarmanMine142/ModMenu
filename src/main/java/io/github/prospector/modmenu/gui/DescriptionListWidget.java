@@ -1,6 +1,5 @@
 package io.github.prospector.modmenu.gui;
 
-
 import io.github.prospector.modmenu.config.ModMenuConfig;
 import io.github.prospector.modmenu.config.ModMenuConfigManager;
 import io.github.prospector.modmenu.util.RenderUtils;

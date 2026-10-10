@@ -1,6 +1,5 @@
 package io.github.prospector.modmenu.gui;
 
-
 import io.github.prospector.modmenu.mixin.MinecraftAccessor;
 import io.github.prospector.modmenu.mixin.TextFieldEditorAccessor;
 import net.minecraft.client.gui.Screen;

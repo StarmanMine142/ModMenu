@@ -1,6 +1,5 @@
 package io.github.prospector.modmenu.gui;
 
-
 import net.minecraft.client.gui.ButtonElement;
 
 public class ModMenuButtonWidget extends ButtonElement {

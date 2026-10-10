@@ -1,6 +1,5 @@
 package io.github.prospector.modmenu.mixin;
 
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.enums.EnumOS;
 import org.spongepowered.asm.mixin.Mixin;

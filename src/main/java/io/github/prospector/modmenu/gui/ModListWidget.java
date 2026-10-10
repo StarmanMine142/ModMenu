@@ -1,6 +1,5 @@
 package io.github.prospector.modmenu.gui;
 
-
 import io.github.prospector.modmenu.ModMenu;
 import io.github.prospector.modmenu.config.ModMenuConfig;
 import io.github.prospector.modmenu.config.ModMenuConfigManager;
@@ -18,15 +17,12 @@ import net.minecraft.client.render.renderer.GLRenderer;
 import net.minecraft.client.render.renderer.Shaders;
 import net.minecraft.client.render.tessellator.TessellatorGeneral;
 import net.minecraft.core.util.helper.MathHelper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.awt.image.BufferedImage;
 import java.nio.file.Path;
 import java.util.*;
 
 public class ModListWidget extends AlwaysSelectedEntryListWidget<ModListEntry> implements AutoCloseable {
-	private static final Logger LOGGER = LoggerFactory.getLogger(ModMenu.MOD_ID);
 	public static final boolean DEBUG = Boolean.getBoolean("modmenu.debug");
 
 	private final Map<Path, BufferedImage> modIconsCache = new HashMap<>();
@@ -34,8 +30,6 @@ public class ModListWidget extends AlwaysSelectedEntryListWidget<ModListEntry> i
 	private List<ModContainer> modContainerList = null;
 	private Set<ModContainer> addedMods = new HashSet<>();
 	private String selectedModId = null;
-	private boolean scrolling;
-	private boolean isFocused;
 
 	ModMenuConfig config = ModMenuConfigManager.getConfig();
 
@@ -58,11 +52,6 @@ public class ModListWidget extends AlwaysSelectedEntryListWidget<ModListEntry> i
 		} else {
 			parent.updateScrollPercent(getScrollAmount() / Math.max(0, this.getMaxPosition() - (this.bottom - this.top - 4)));
 		}
-	}
-
-	@Override
-	protected boolean isFocused() {
-		return isFocused;
 	}
 
 	public void select(ModListEntry entry) {
@@ -132,7 +121,6 @@ public class ModListWidget extends AlwaysSelectedEntryListWidget<ModListEntry> i
 			this.modContainerList.sort(config.getSorting().getComparator());
 		}
 
-		boolean validSearch = ModListSearch.validSearchQuery(searchTerm);
 		List<ModContainer> matched = ModListSearch.search(parent, searchTerm, modContainerList);
 
 		for (ModContainer container : matched) {
@@ -229,12 +217,6 @@ public class ModListWidget extends AlwaysSelectedEntryListWidget<ModListEntry> i
 
 		GLRenderer.popFrame();
 
-	}
-
-	@Override
-	protected void updateScrollingState(double double_1, double double_2, int int_1) {
-		super.updateScrollingState(double_1, double_2, int_1);
-		this.scrolling = int_1 == 0 && double_1 >= (double) this.getScrollbarPosition() && double_1 < (double) (this.getScrollbarPosition() + 6);
 	}
 
 	@Override

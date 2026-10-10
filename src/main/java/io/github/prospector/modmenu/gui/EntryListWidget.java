@@ -1,6 +1,5 @@
 package io.github.prospector.modmenu.gui;
 
-
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
@@ -352,30 +351,22 @@ public abstract class EntryListWidget<E extends EntryListWidget.Entry<E>> extend
 		return false;
 	}
 
-	public boolean mouseDragged(double mouseX, double mouseY, int mouseButton, double mouseDX, double mouseDY) {
+	public void mouseDragged(double mouseX, double mouseY, int mouseButton, double mouseDX, double mouseDY) {
 		if (this.scrolling) {
 			setScrollAmount(getScrollAmount() - mouseDY);
-			return true;
 		}
-		return false;
 	}
 
-	public boolean mouseScrolled(double d, double e, double f) {
+	public void mouseScrolled(double d, double e, double f) {
 		this.setScrollAmount(this.getScrollAmount() - f * (double)this.itemHeight / 2.0D);
-		return true;
 	}
 
-	public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+	public void keyPressed(int keyCode, int scanCode, int modifiers) {
 		if (this.getFocused() != null && this.getFocused().keyPressed(keyCode, scanCode, modifiers)) {
-			return true;
 		} else if (keyCode == 264) {
 			this.moveSelection(1);
-			return true;
 		} else if (keyCode == 265) {
 			this.moveSelection(-1);
-			return true;
-		} else {
-			return false;
 		}
 	}
 
@@ -552,8 +543,7 @@ public abstract class EntryListWidget<E extends EntryListWidget.Entry<E>> extend
 		public void mouseClicked(int d, int e, int f) {
 		}
 
-		public boolean mouseReleased(double d, double e, int i) {
-			return false;
+		public void mouseReleased(double d, double e, int i) {
 		}
 
 		public boolean mouseScrolled(double d, double e, double f) {

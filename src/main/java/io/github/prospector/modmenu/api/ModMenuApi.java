@@ -1,6 +1,5 @@
 package io.github.prospector.modmenu.api;
 
-
 import io.github.prospector.modmenu.ModMenu;
 import io.github.prospector.modmenu.util.TriConsumer;
 import net.minecraft.client.gui.Screen;
