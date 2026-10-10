@@ -1,6 +1,7 @@
 package io.github.prospector.modmenu.gui;
 
 
+import io.github.prospector.modmenu.config.ModMenuConfig;
 import io.github.prospector.modmenu.config.ModMenuConfigManager;
 import io.github.prospector.modmenu.util.RenderUtils;
 import net.fabricmc.loader.api.metadata.ContactInformation;
@@ -20,6 +21,8 @@ public class DescriptionListWidget extends EntryListWidget<DescriptionListWidget
 	private final ModListScreen parent;
 	private final FontRenderer textRenderer;
 	private ModListEntry lastSelected = null;
+
+	ModMenuConfig config = ModMenuConfigManager.getConfig();
 
 	public DescriptionListWidget(Minecraft client, int width, int height, int top, int bottom, int entryHeight, ModListScreen parent) {
 		super(client, width, height, top, bottom, entryHeight);
@@ -115,7 +118,7 @@ public class DescriptionListWidget extends EntryListWidget<DescriptionListWidget
 			String translatedDesc = i18n.translateKey(descKey);
 
 			String description;
-			if (!translatedDesc.equals(descKey) && ModMenuConfigManager.getConfig().getTranslateDescriptions()) {
+			if (!translatedDesc.equals(descKey) && config.getTranslateDescriptions()) {
 				description = translatedDesc;
 			} else {
 				description = selectedEntry.getMetadata().getDescription();
@@ -150,7 +153,7 @@ public class DescriptionListWidget extends EntryListWidget<DescriptionListWidget
 			links.remove("homepage");
 			links.remove("issues");
 
-			if (!links.isEmpty()) {
+			if (!links.isEmpty() && !config.getHideModLinks()) {
 				children().add(new DescriptionEntry(""));
 
 				for (String line : RenderUtils.INSTANCE.wrapStringToWidthAsList(textRenderer, i18n.translateKey("modmenu.links"), getRowWidth())) {
@@ -173,7 +176,7 @@ public class DescriptionListWidget extends EntryListWidget<DescriptionListWidget
 				});
 			}
 
-			if (!licenses.isEmpty()) {
+			if (!licenses.isEmpty() && !config.getHideModLicense()) {
 				if (!children().isEmpty()) children().add(new DescriptionEntry(""));
 				children().add(new DescriptionEntry(i18n.translateKey("modmenu.license")));
 				for (String license : licenses) {
@@ -181,7 +184,7 @@ public class DescriptionListWidget extends EntryListWidget<DescriptionListWidget
 				}
 			}
 
-			if ("minecraft".equals(id)) {
+			if ("minecraft".equals(id) && !config.getHideModCredits()) {
 				if (!children().isEmpty()) children().add(new DescriptionEntry(""));
 				String viewCreditsText = i18n.translateKey("modmenu.viewCredits");
 				for (String line : RenderUtils.INSTANCE.wrapStringToWidthAsList(textRenderer, viewCreditsText, getRowWidth() - 16)) {
@@ -189,7 +192,7 @@ public class DescriptionListWidget extends EntryListWidget<DescriptionListWidget
 				}
 			}
 
-			if (!authors.isEmpty() || !contributors.isEmpty()) {
+			if ((!authors.isEmpty() || !contributors.isEmpty()) && !config.getHideModCredits()) {
 				if (!children().isEmpty()) children().add(new DescriptionEntry(""));
 
 				children().add(new DescriptionEntry(i18n.translateKey("modmenu.credits")));

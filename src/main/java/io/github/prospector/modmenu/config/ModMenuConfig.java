@@ -6,27 +6,53 @@ import net.minecraft.core.lang.I18n;
 import java.util.Comparator;
 
 public class ModMenuConfig {
-	private boolean showLibraries = false;
 	private Sorting sorting = Sorting.ASCENDING;
-	private boolean hideBadges = true;
+	private boolean showLibraries = false;
+	private boolean hideConfigButtons = false;
+	private boolean hideBadges = false;
+	private boolean hideModLinks = false;
+	private boolean hideModCredits = false;
+	private boolean hideModLicense = false;
 	private boolean easterEggs = true;
 	private GameMenuButtonStyle gameMenuButtonStyle = GameMenuButtonStyle.INSERT;
 	private ModsButtonStyle modsButtonStyle = ModsButtonStyle.INSERT;
+	private boolean randomJavaColors = true;
 	private boolean translateNames = true;
 	private boolean translateDescriptions = true;
-
-	public void toggleShowLibraries() {
-		this.showLibraries = !this.showLibraries;
-		ModMenuConfigManager.save();
-	}
+	private boolean quickConfigure = true;
 
 	public void toggleSortMode() {
 		this.sorting = next(this.sorting);
 		ModMenuConfigManager.save();
 	}
 
+	public void toggleShowLibraries() {
+		this.showLibraries = !this.showLibraries;
+		ModMenuConfigManager.save();
+	}
+
+	public void toggleHideConfigButtons() {
+		this.hideConfigButtons = !this.hideConfigButtons;
+		ModMenuConfigManager.save();
+	}
+
 	public void toggleHideBadges() {
 		this.hideBadges = !this.hideBadges;
+		ModMenuConfigManager.save();
+	}
+
+	public void toggleHideModLinks() {
+		this.hideModLinks = !this.hideModLinks;
+		ModMenuConfigManager.save();
+	}
+
+	public void toggleHideModCredits() {
+		this.hideModCredits = !this.hideModCredits;
+		ModMenuConfigManager.save();
+	}
+
+	public void toggleHideModLicense() {
+		this.hideModLicense = !this.hideModLicense;
 		ModMenuConfigManager.save();
 	}
 
@@ -45,6 +71,11 @@ public class ModMenuConfig {
 		ModMenuConfigManager.save();
 	}
 
+	public void toggleRandomJavaColors() {
+		this.randomJavaColors = !this.randomJavaColors;
+		ModMenuConfigManager.save();
+	}
+
 	public void toggleTranslateNames() {
 		this.translateNames = !this.translateNames;
 		ModMenuConfigManager.save();
@@ -55,16 +86,37 @@ public class ModMenuConfig {
 		ModMenuConfigManager.save();
 	}
 
-	public boolean showLibraries() {
-		return showLibraries;
+	public void toggleQuickConfigure() {
+		this.quickConfigure = !this.quickConfigure;
+		ModMenuConfigManager.save();
 	}
 
 	public Sorting getSorting() {
 		return sorting;
 	}
 
+	public boolean getShowLibraries() {
+		return showLibraries;
+	}
+
+	public boolean getHideConfigButtons() {
+		return hideConfigButtons;
+	}
+
 	public boolean getHideBadges() {
 		return hideBadges;
+	}
+
+	public boolean getHideModLinks() {
+		return hideModLinks;
+	}
+
+	public boolean getHideModCredits() {
+		return hideModCredits;
+	}
+
+	public boolean getHideModLicense() {
+		return hideModLicense;
 	}
 
 	public boolean getEasterEggs() {
@@ -79,12 +131,20 @@ public class ModMenuConfig {
 		return modsButtonStyle;
 	}
 
+	public boolean getRandomJavaColors() {
+		return randomJavaColors;
+	}
+
 	public boolean getTranslateNames() {
 		return translateNames;
 	}
 
 	public boolean getTranslateDescriptions() {
 		return translateDescriptions;
+	}
+
+	public boolean getQuickConfigure() {
+		return quickConfigure;
 	}
 
 	public String getSortingDisplayString() {
@@ -95,8 +155,24 @@ public class ModMenuConfig {
 		return optionString("show_libraries", I18n.getInstance().translateKey("option.modmenu.show_libraries." + this.showLibraries));
 	}
 
+	public String getHideConfigButtonsDisplayString() {
+		return optionString("hide_config_buttons", I18n.getInstance().translateKey("option.modmenu.hide_config_buttons." + this.hideConfigButtons));
+	}
+
 	public String getHideBadgesDisplayString() {
 		return optionString("hide_badges", I18n.getInstance().translateKey("option.modmenu.hide_badges." + this.hideBadges));
+	}
+
+	public String getHideModLinksDisplayString() {
+		return optionString("hide_mod_links", I18n.getInstance().translateKey("option.modmenu.hide_mod_links." + this.hideModLinks));
+	}
+
+	public String getHideModCreditsDisplayString() {
+		return optionString("hide_mod_credits", I18n.getInstance().translateKey("option.modmenu.hide_mod_credits." + this.hideModCredits));
+	}
+
+	public String getHideModLicenseDisplayString() {
+		return optionString("hide_mod_license", I18n.getInstance().translateKey("option.modmenu.hide_mod_license." + this.getHideModLicense()));
 	}
 
 	public String getEasterEggsDisplayString() {
@@ -111,12 +187,20 @@ public class ModMenuConfig {
 		return optionString("game_menu_button_style", this.gameMenuButtonStyle.getName());
 	}
 
+	public String getRandomJavaColorsDisplayString() {
+		return optionString("random_java_colors", I18n.getInstance().translateKey("option.modmenu.random_java_colors." + this.randomJavaColors));
+	}
+
 	public String getTranslateNamesDisplayString() {
 		return optionString("translate_names", I18n.getInstance().translateKey("option.modmenu.translate_names." + this.translateNames));
 	}
 
 	public String getTranslateDescriptionsDisplayString() {
 		return optionString("translate_descriptions", I18n.getInstance().translateKey("option.modmenu.translate_descriptions." + this.translateDescriptions));
+	}
+
+	public String getQuickConfigureDisplayString() {
+		return optionString("quick_configure", I18n.getInstance().translateKey("option.modmenu.quick_configure." + this.quickConfigure));
 	}
 
 	private static <T extends Enum<T>> T next(T current) {

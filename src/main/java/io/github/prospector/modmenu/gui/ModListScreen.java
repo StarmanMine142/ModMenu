@@ -1,9 +1,11 @@
 package io.github.prospector.modmenu.gui;
 
 import io.github.prospector.modmenu.ModMenu;
+import io.github.prospector.modmenu.config.ModMenuConfig;
 import io.github.prospector.modmenu.config.ModMenuConfigManager;
 import io.github.prospector.modmenu.util.BadgeRenderer;
 import io.github.prospector.modmenu.util.ButtonUtil;
+import io.github.prospector.modmenu.util.DrawingUtil;
 import io.github.prospector.modmenu.util.RenderUtils;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.metadata.ModMetadata;
@@ -54,6 +56,9 @@ public class ModListScreen extends Screen {
 	public Set<String> showModChildren = new HashSet<>();
 	private String lastSearchString = null;
 
+	ModMenuConfig config = ModMenuConfigManager.getConfig();
+	I18n i18n = I18n.getInstance();
+
 	private static final int CONFIGURE_BUTTON_ID = 0;
 	private static final int WEBSITE_BUTTON_ID = 1;
 	private static final int ISSUES_BUTTON_ID = 2;
@@ -62,8 +67,6 @@ public class ModListScreen extends Screen {
 	private static final int TOGGLE_SHOW_LIBRARIES_BUTTON_ID = 5;
 	private static final int MODS_FOLDER_BUTTON_ID = 6;
 	private static final int DONE_BUTTON_ID = 7;
-
-	I18n i18n = I18n.getInstance();
 
 	public ModListScreen(Screen previousGui) {
 		this.parent = previousGui;
@@ -110,15 +113,14 @@ public class ModListScreen extends Screen {
 		this.descriptionListWidget = new DescriptionListWidget(this.mc, paneWidth, this.height, paneY + 60, this.height - 36, 9 + 1, this);
 		this.descriptionListWidget.setLeftPos(rightPaneX);
 		ButtonElement configureButton = new ModMenuTexturedButtonWidget(CONFIGURE_BUTTON_ID, width - 24, paneY, 20, 20, 0, 0, CONFIGURE_BUTTON_LOCATION, 32, 64) {
-
 			@Override
 			public void render(Minecraft mc, int mouseX, int mouseY) {
 				if (isHovered(mouseX, mouseY)) {
 					setTooltip(i18n.translateKey("modmenu.configure"));
 				}
 				if (selected != null) {
-					String modid = selected.getMetadata().getId();
-					enabled = ModMenu.hasConfigScreenFactory(modid) || ModMenu.hasLegacyConfigScreenTask(modid);
+					String id = selected.getMetadata().getId();
+					enabled = (ModMenu.hasConfigScreenFactory(id) || ModMenu.hasLegacyConfigScreenTask(id));
 				} else {
 					enabled = false;
 				}
@@ -157,8 +159,8 @@ public class ModListScreen extends Screen {
 				}
 			}
 		});
-		String showLibrariesText = ModMenuConfigManager.getConfig().getShowLibrariesDisplayString();
-		String sortingText = ModMenuConfigManager.getConfig().getSortingDisplayString();
+		String showLibrariesText = config.getShowLibrariesDisplayString();
+		String sortingText = config.getSortingDisplayString();
 		int showLibrariesWidth = fontRenderer.stringWidth(showLibrariesText) + 20;
 		int sortingWidth = fontRenderer.stringWidth(sortingText) + 20;
 		int filtersX;
@@ -174,7 +176,7 @@ public class ModListScreen extends Screen {
 			@Override
 			public void drawButton(Minecraft mc, int mouseX, int mouseY) {
 				visible = enabled = filterOptionsShown;
-				this.displayString = ModMenuConfigManager.getConfig().getSortingDisplayString();
+				this.displayString = config.getSortingDisplayString();
 				super.drawButton(mc, mouseX, mouseY);
 			}
 		});
@@ -182,11 +184,13 @@ public class ModListScreen extends Screen {
 			@Override
 			public void drawButton(Minecraft mc, int mouseX, int mouseY) {
 				visible = enabled = filterOptionsShown;
-				this.displayString = ModMenuConfigManager.getConfig().getShowLibrariesDisplayString();
+				this.displayString = config.getShowLibrariesDisplayString();
 				super.drawButton(mc, mouseX, mouseY);
 			}
 		});
-		this.buttons.add(configureButton);
+		if (!config.getHideConfigButtons()) {
+			this.buttons.add(configureButton);
+		}
 		this.buttons.add(websiteButton);
 		this.buttons.add(issuesButton);
 		this.buttons.add(ButtonUtil.createButton(MODS_FOLDER_BUTTON_ID, this.width / 2 - 154, this.height - 28, 150, 20, i18n.translateKey("modmenu.modsFolder")));
@@ -211,9 +215,8 @@ public class ModListScreen extends Screen {
 			}
 			case WEBSITE_BUTTON_ID: {
 				if (selected != null) {
-					String modId = selected.getMetadata().getId();
-
-					if ("minecraft".equals(modId)) {
+					String id = selected.getMetadata().getId();
+					if ("minecraft".equals(id)) {
 						UrlHelper.openURL("https://www.betterthanadventure.net/");
 					} else {
 						selected.getMetadata().getContact().get("homepage").ifPresent(UrlHelper::openURL);
@@ -223,9 +226,8 @@ public class ModListScreen extends Screen {
 			}
 			case ISSUES_BUTTON_ID: {
 				if (selected != null) {
-					String modId = selected.getMetadata().getId();
-
-					if ("minecraft".equals(modId)) {
+					String id = selected.getMetadata().getId();
+					if ("minecraft".equals(id)) {
 						UrlHelper.openURL("https://support.betterthanadventure.net/");
 					} else {
 						selected.getMetadata().getContact().get("issues").ifPresent(UrlHelper::openURL);
@@ -238,12 +240,12 @@ public class ModListScreen extends Screen {
 				break;
 			}
 			case TOGGLE_SORT_MODE_BUTTON_ID: {
-				ModMenuConfigManager.getConfig().toggleSortMode();
+				config.toggleSortMode();
 				modList.reloadFilters();
 				break;
 			}
 			case TOGGLE_SHOW_LIBRARIES_BUTTON_ID: {
-				ModMenuConfigManager.getConfig().toggleShowLibraries();
+				config.toggleShowLibraries();
 				modList.reloadFilters();
 				break;
 			}
@@ -341,20 +343,25 @@ public class ModListScreen extends Screen {
 		}
 		if (selectedEntry != null) {
 			ModMetadata metadata = selectedEntry.getMetadata();
+			String id = metadata.getId();
+
 			int x = rightPaneX;
 
 			int prevColor = GLRenderer.getColor();
 			GLRenderer.setColor4f(1, 1, 1, 1);
 
+			if ("java".equals(id)) {
+				DrawingUtil.drawRandomVersionBackground(selectedEntry.container, x, paneY, 32, 32);
+			}
+
 			this.selected.bindIconTexture();
 			ModListEntry.internalRender(paneY, x);
 			int lineSpacing = 9 + 1;
 			int imageOffset = 36;
-			String id = metadata.getId();
 			String translationKey = "modmenu.nameTranslation." + id;
 			String translatedName = i18n.translateKey(translationKey);
 			String name;
-			if (!translatedName.equals(translationKey) && ModMenuConfigManager.getConfig().getTranslateNames()) {
+			if (!translatedName.equals(translationKey) && config.getTranslateNames()) {
 				name = translatedName;
 			} else {
 				name = metadata.getName();
@@ -373,8 +380,8 @@ public class ModListScreen extends Screen {
 			}
 			badgeRenderer.draw(mouseX, mouseY);
 			String versionString = metadata.getId().equals("minecraft")
-			? Global.VERSION
-			: metadata.getVersion().getFriendlyString();
+					? Global.VERSION
+					: metadata.getVersion().getFriendlyString();
 			this.drawStringNoShadow(font, "v" + versionString, x + imageOffset, paneY + 2 + lineSpacing, 0x808080);
 			String authors;
 			List<String> names = new ArrayList<>();

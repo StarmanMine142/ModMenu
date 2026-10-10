@@ -24,10 +24,11 @@ public class MixinGuiMainMenu extends Screen {
 	public void modmenu$drawMenuButton(CallbackInfo info) {
 		ButtonElement texturePackButton = this.buttons.get(2);
 		I18n i18n = I18n.getInstance();
-		if (ModMenuConfigManager.getConfig().getEasterEggs()) {
-		texturePackButton.displayString = new Random().nextInt(1000) == 0 ? "Twin Peaks" : i18n.translateKey("gui.main_menu.button.asset_packs");
+		ModMenuConfig config = ModMenuConfigManager.getConfig();
+		if (config.getEasterEggs()) {
+			texturePackButton.displayString = new Random().nextInt(1000) == 0 ? "Twin Peaks" : i18n.translateKey("gui.main_menu.button.asset_packs");
 		}
-		if (ModMenuConfigManager.getConfig().getModsButtonStyle() == ModMenuConfig.ModsButtonStyle.INSERT) {
+		if (config.getModsButtonStyle() == ModMenuConfig.ModsButtonStyle.INSERT) {
 			int newWidth = ((GuiButtonAccessor) texturePackButton).getWidth() / 2 - 1;
 			((GuiButtonAccessor) texturePackButton).setWidth(newWidth);
 			String buttonText = i18n.translateKey("modmenu.title") + " " + i18n.translateKeyAndFormat("modmenu.loaded", ModMenu.getFormattedModCount());

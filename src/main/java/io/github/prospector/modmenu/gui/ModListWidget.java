@@ -2,6 +2,7 @@ package io.github.prospector.modmenu.gui;
 
 
 import io.github.prospector.modmenu.ModMenu;
+import io.github.prospector.modmenu.config.ModMenuConfig;
 import io.github.prospector.modmenu.config.ModMenuConfigManager;
 import io.github.prospector.modmenu.gui.entries.ChildEntry;
 import io.github.prospector.modmenu.gui.entries.IndependentEntry;
@@ -12,6 +13,7 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
 import net.fabricmc.loader.api.metadata.ModMetadata;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Screen;
 import net.minecraft.client.render.renderer.GLRenderer;
 import net.minecraft.client.render.renderer.Shaders;
 import net.minecraft.client.render.tessellator.TessellatorGeneral;
@@ -35,6 +37,8 @@ public class ModListWidget extends AlwaysSelectedEntryListWidget<ModListEntry> i
 	private boolean scrolling;
 	private boolean isFocused;
 
+	ModMenuConfig config = ModMenuConfigManager.getConfig();
+
 	public ModListWidget(Minecraft client, int width, int height, int y1, int y2, int entryHeight, String searchTerm, ModListWidget list, ModListScreen parent) {
 		super(client, width, height, y1, y2, entryHeight);
 		this.parent = parent;
@@ -49,7 +53,7 @@ public class ModListWidget extends AlwaysSelectedEntryListWidget<ModListEntry> i
 	public void setScrollAmount(double amount) {
 		super.setScrollAmount(amount);
 		int denominator = Math.max(0, this.getMaxPosition() - (this.bottom - this.top - 4));
-		if (denominator <= 0) {
+		if (denominator == 0) {
 			parent.updateScrollPercent(0);
 		} else {
 			parent.updateScrollPercent(getScrollAmount() / Math.max(0, this.getMaxPosition() - (this.bottom - this.top - 4)));
@@ -125,7 +129,7 @@ public class ModListWidget extends AlwaysSelectedEntryListWidget<ModListEntry> i
 		if (this.modContainerList == null || refresh) {
 			this.modContainerList = new ArrayList<>();
 			modContainerList.addAll(mods);
-			this.modContainerList.sort(ModMenuConfigManager.getConfig().getSorting().getComparator());
+			this.modContainerList.sort(config.getSorting().getComparator());
 		}
 
 		boolean validSearch = ModListSearch.validSearchQuery(searchTerm);
@@ -137,7 +141,7 @@ public class ModListWidget extends AlwaysSelectedEntryListWidget<ModListEntry> i
 			boolean library = ModMenu.LIBRARY_MODS.contains(modId);
 
 			//Hide parent lib mods when the config is set to hide
-			if (library && !ModMenuConfigManager.getConfig().showLibraries()) {
+			if (library && !config.getShowLibraries()) {
 				continue;
 			}
 
@@ -145,7 +149,7 @@ public class ModListWidget extends AlwaysSelectedEntryListWidget<ModListEntry> i
 				if (ModMenu.PARENT_MAP.keySet().contains(container)) {
 					//Add parent mods when not searching
 					List<ModContainer> children = ModMenu.PARENT_MAP.get(container);
-					children.sort(ModMenuConfigManager.getConfig().getSorting().getComparator());
+					children.sort(config.getSorting().getComparator());
 					ParentEntry parent = new ParentEntry(minecraft, container, children, this);
 					this.addEntry(parent);
 					//Add children if they are meant to be shown
@@ -239,6 +243,28 @@ public class ModListWidget extends AlwaysSelectedEntryListWidget<ModListEntry> i
 		if (this.isMouseOver(double_1, double_2))  {
 			ModListEntry entry = this.getEntryAtPos(double_1, double_2);
 			if (entry != null) {
+				if (int_1 == 0 && !(entry instanceof ParentEntry) && config.getQuickConfigure()) {
+					String id = entry.getMetadata().getId();
+					if (ModMenu.hasConfigScreenFactory(id) || ModMenu.hasLegacyConfigScreenTask(id)) {
+						int iconLeft = getRowLeft() + entry.getXOffset();
+						if (double_1 >= iconLeft && double_1 < iconLeft + 32) {
+							int index = children().indexOf(entry);
+							if (index >= 0) {
+								int entryTop = this.getRowTop(index) + 2;
+								if (double_2 >= entryTop && double_2 < entryTop + 32) {
+									final Screen screen = ModMenu.getConfigScreen(id, parent);
+									if (screen != null) {
+										minecraft.displayScreen(screen);
+									} else {
+										ModMenu.openConfigScreen(id);
+									}
+									return;
+								}
+							}
+						}
+					}
+				}
+
 				if (entry.list.getFocused() != null) {
 					if (!entry.list.getFocused().equals(entry)) {
 						this.setFocused(entry);

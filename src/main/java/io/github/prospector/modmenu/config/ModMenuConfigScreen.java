@@ -70,7 +70,7 @@ public class ModMenuConfigScreen extends Screen {
                 startY + 48,
                 buttonWidth,
                 buttonHeight,
-                config.getHideBadgesDisplayString()
+                config.getHideModLinksDisplayString()
         ));
 
         this.add(new ButtonElement(
@@ -79,7 +79,7 @@ public class ModMenuConfigScreen extends Screen {
                 startY + 48,
                 buttonWidth,
                 buttonHeight,
-                config.getEasterEggsDisplayString()
+                config.getHideModLicenseDisplayString()
         ));
 
         this.add(new ButtonElement(
@@ -88,7 +88,7 @@ public class ModMenuConfigScreen extends Screen {
                 startY + 72,
                 buttonWidth,
                 buttonHeight,
-                config.getTranslateNamesDisplayString()
+                config.getHideBadgesDisplayString()
         ));
 
         this.add(new ButtonElement(
@@ -97,8 +97,63 @@ public class ModMenuConfigScreen extends Screen {
                 startY + 72,
                 buttonWidth,
                 buttonHeight,
+                config.getHideModCreditsDisplayString()
+        ));
+
+        this.add(new ButtonElement(
+                109,
+                leftX,
+                startY + 96,
+                buttonWidth,
+                buttonHeight,
+                config.getEasterEggsDisplayString()
+        ));
+
+        this.add(new ButtonElement(
+                108,
+                rightX,
+                startY + 96,
+                buttonWidth,
+                buttonHeight,
+                config.getRandomJavaColorsDisplayString()
+        ));
+
+        this.add(new ButtonElement(
+                110,
+                leftX,
+                startY + 120,
+                buttonWidth,
+                buttonHeight,
+                config.getTranslateNamesDisplayString()
+        ));
+
+        this.add(new ButtonElement(
+                111,
+                rightX,
+                startY + 120,
+                buttonWidth,
+                buttonHeight,
                 config.getTranslateDescriptionsDisplayString()
         ));
+
+        this.add(new ButtonElement(
+                112,
+                leftX,
+                startY + 144,
+                buttonWidth,
+                buttonHeight,
+                config.getQuickConfigureDisplayString()
+        ));
+
+        this.add(new ButtonElement(
+                113,
+                rightX,
+                startY + 144,
+                buttonWidth,
+                buttonHeight,
+                config.getHideConfigButtonsDisplayString()
+        ));
+
 
         int doneButtonWidth = 200;
         this.add(new ButtonElement(
@@ -138,17 +193,35 @@ public class ModMenuConfigScreen extends Screen {
             config.toggleGameMenuButtonStyle();
             button.displayString = config.getGameMenuButtonStyleDisplayString();
         } else if (button.id == 104) {
+            config.toggleHideModLinks();
+            button.displayString = config.getHideModLinksDisplayString();
+        } else if (button.id == 105) {
+            config.toggleHideModLicense();
+            button.displayString = config.getHideModLicenseDisplayString();
+        } else if (button.id == 106) {
             config.toggleHideBadges();
             button.displayString = config.getHideBadgesDisplayString();
-        } else if (button.id == 105) {
+        } else if (button.id == 107) {
+            config.toggleHideModCredits();
+            button.displayString = config.getHideModCreditsDisplayString();
+        } else if (button.id == 108) {
             config.toggleEasterEggs();
             button.displayString = config.getEasterEggsDisplayString();
-        } else if (button.id == 106) {
+        } else if (button.id == 109) {
+            config.toggleRandomJavaColors();
+            button.displayString = config.getRandomJavaColorsDisplayString();
+        } else if (button.id == 110) {
             config.toggleTranslateNames();
             button.displayString = config.getTranslateNamesDisplayString();
-        } else if (button.id == 107) {
+        } else if (button.id == 111) {
             config.toggleTranslateDescriptions();
             button.displayString = config.getTranslateDescriptionsDisplayString();
+        } else if (button.id == 112) {
+            config.toggleQuickConfigure();
+            button.displayString = config.getQuickConfigureDisplayString();
+        } else if (button.id == 113) {
+            config.toggleHideConfigButtons();
+            button.displayString = config.getHideConfigButtonsDisplayString();
         } else if (button.id == 200) {
             this.closeAndReturn();
         }

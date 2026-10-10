@@ -4,7 +4,9 @@ package io.github.prospector.modmenu.gui;
 import io.github.prospector.modmenu.ModMenu;
 import io.github.prospector.modmenu.config.ModMenuConfig;
 import io.github.prospector.modmenu.config.ModMenuConfigManager;
+import io.github.prospector.modmenu.gui.entries.ParentEntry;
 import io.github.prospector.modmenu.util.BadgeRenderer;
+import io.github.prospector.modmenu.util.DrawingUtil;
 import io.github.prospector.modmenu.util.RenderUtils;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
@@ -36,6 +38,9 @@ public class ModListEntry extends AlwaysSelectedEntryListWidget.Entry<ModListEnt
 	protected final ModMetadata metadata;
 	protected final ModListWidget list;
 	protected Integer iconLocation;
+	private int lastRenderX;
+	private int lastRenderY;
+	ModMenuConfig config = ModMenuConfigManager.getConfig();
 
 	public ModListEntry(Minecraft mc, ModContainer container, ModListWidget list) {
 		this.container = container;
@@ -47,18 +52,71 @@ public class ModListEntry extends AlwaysSelectedEntryListWidget.Entry<ModListEnt
 	@Override
 	public void render(int index, int y, int x, int rowWidth, int rowHeight, int mouseX, int mouseY, boolean isSelected, float delta) {
 		I18n i18n = I18n.getInstance();
-		ModMenuConfig config = ModMenuConfigManager.getConfig();
+		String id = metadata.getId();
 
 		x += getXOffset();
 		rowWidth -= getXOffset();
 
 		GLRenderer.pushFrame();
 
+		if ("java".equals(id)) {
+			DrawingUtil.drawRandomVersionBackground(container, x, y, 32, 32);
+		}
+
 		GLRenderer.setColor4f(1, 1, 1, 1); // We LOVE random color calls
+
 		this.bindIconTexture();
 		internalRender(y, x);
 
-		String id = metadata.getId();
+		this.lastRenderX = x;
+		this.lastRenderY = y;
+
+		if (!(this instanceof ParentEntry) && (ModMenu.hasConfigScreenFactory(id) || ModMenu.hasLegacyConfigScreenTask(id)) && config.getQuickConfigure()) {
+			int iconSize = 32;
+			boolean hovered = mouseX >= x && mouseY >= y && mouseX < x + rowWidth && mouseY < y + iconSize;
+
+			if (hovered) {
+				GLRenderer.pushFrame();
+				GLRenderer.setShader(Shaders.COLOR);
+				GLRenderer.enableState(State.BLEND);
+				GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+				GLRenderer.setColor4f(1, 1, 1, 0.4f);
+
+				TessellatorGeneral t = GLRenderer.getTessellator();
+				t.startDrawingQuads();
+				t.addVertexWithUV(x, y + iconSize, 0, 0, 0);
+				t.addVertexWithUV(x + iconSize, y + iconSize, 0, 1, 0);
+				t.addVertexWithUV(x + iconSize, y, 0, 1, 1);
+				t.addVertexWithUV(x, y, 0, 0, 1);
+				t.draw();
+				GLRenderer.popFrame();
+
+				boolean hoveringIcon = mouseX < x + iconSize && mouseY < y + iconSize;
+
+				GLRenderer.pushFrame();
+				GLRenderer.setShader(Shaders.INTERFACE);
+				GLRenderer.setColor4f(1, 1, 1, 1);
+
+				client.textureManager.bindTexture(client.textureManager.loadTexture("/assets/modmenu/textures/gui/mod_configuration.png"));
+
+				float vMin = hoveringIcon ? 32.0f / 256.0f : 0.0f;
+				float vMax = hoveringIcon ? 64.0f / 256.0f : 32.0f / 256.0f;
+				float uMax = 32.0f / 256.0f;
+
+				t.startDrawingQuads();
+				t.addVertexWithUV(x, y + iconSize, 0, 0.0f, vMax);
+				t.addVertexWithUV(x + iconSize, y + iconSize, 0, uMax, vMax);
+				t.addVertexWithUV(x + iconSize, y, 0, uMax, vMin);
+				t.addVertexWithUV(x, y, 0, 0.0f, vMin);
+				t.draw();
+				GLRenderer.popFrame();
+
+				if (hoveringIcon) {
+					list.getParent().setDesiredCursor(net.minecraft.client.render.window.CursorShape.HAND);
+				}
+			}
+		}
+
 		String translationKey = "modmenu.nameTranslation." + id;
 		String translatedName = i18n.translateKey(translationKey);
 		String name;
@@ -168,6 +226,21 @@ public class ModListEntry extends AlwaysSelectedEntryListWidget.Entry<ModListEnt
 	@Override
 	public void mouseClicked(int v, int v1, int i) {
 		list.select(this);
+
+		if (i == 0 && !(this instanceof ParentEntry)) {
+			String id = metadata.getId();
+			if (ModMenu.hasConfigScreenFactory(id) || ModMenu.hasLegacyConfigScreenTask(id) && config.getQuickConfigure()) {
+				int iconLeft = getXOffset();
+				if (v >= iconLeft && v < iconLeft + 32 && v1 >= 0 && v1 < 32) {
+					final net.minecraft.client.gui.Screen screen = ModMenu.getConfigScreen(id, list.getParent());
+					if (screen != null) {
+						client.displayScreen(screen);
+					} else {
+						ModMenu.openConfigScreen(id);
+					}
+				}
+			}
+		}
 	}
 
 	public ModMetadata getMetadata() {
