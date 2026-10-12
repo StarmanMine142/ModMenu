@@ -1,0 +1,122 @@
+modmenu.title=Моди
+modmenu.nameTranslation.modmenu=Mod Menu
+modmenu.descriptionTranslation.modmenu=Додає меню для перегляду встановлених модів.
+
+modmenu.loaded=(%s)
+
+modmenu.search=Пошук
+modmenu.searchTerms.library=api бібліотека library
+modmenu.searchTerms.clientside=сторонаклієнта клієт client
+modmenu.searchTerms.deprecated=застарілий віджилий старий old outdated deprecated
+modmenu.searchTerms.patchwork=роботапатча forge fml patch
+modmenu.searchTerms.configurable=конфігурація налаштування налаштувань параметри настройки config settings options
+
+modmenu.toggleFilterOptions=Фільтри
+modmenu.showingMods.n=Показано %s модів
+modmenu.showingMods.1=Показано %s мод
+modmenu.showingLibraries.n=Показано %s бібліотек
+modmenu.showingLibraries.1=Показано %s бібліотеку
+modmenu.showingModsLibraries.n.n=Показано %s модів і %s бібліотек
+modmenu.showingModsLibraries.n.1=Показано %s модів і %s бібліотеку
+modmenu.showingModsLibraries.1.n=Показано %s мод і %s бібліотек
+modmenu.showingModsLibraries.1.1=Показано %s мод і %s бібліотеку
+
+modmenu.badge.clientsideOnly=Клієнт
+modmenu.badge.library=Бібліотека
+modmenu.badge.deprecated=Застарілий
+modmenu.badge.minecraft=Minecraft
+modmenu.badge.forge=Forge
+
+modmenu.modIdToolTip=ID мода: %s
+modmenu.authorPrefix=Від %s
+modmenu.config=Редагувати налаштування
+modmenu.configure=Налаштування…
+modmenu.website=Сайт мода
+modmenu.issues=Звітувати помилку
+
+modmenu.credits=Згадки:
+modmenu.viewCredits=Показати авторів
+modmenu.license=Ліцензія:
+modmenu.links=Посилання:
+modmenu.sources=Початковий код
+
+modmenu.bluesky=Bluesky
+modmenu.buymeacoffee=Buy Me a Coffee
+modmenu.coindrop=Coindrop
+modmenu.crowdin=Crowdin
+modmenu.curseforge=CurseForge
+modmenu.discord=Discord
+modmenu.donate=Підтримати
+modmenu.flattr=Flattr
+modmenu.github_releases=Випуски на GitHub
+modmenu.github_sponsors=Спонсори GitHub
+modmenu.kofi=Ko-fi
+modmenu.liberapay=Liberapay
+modmenu.mastodon=Mastodon
+modmenu.modrinth=Modrinth
+modmenu.opencollective=Open Collective
+modmenu.patreon=Patreon
+modmenu.paypal=PayPal
+modmenu.reddit=Reddit
+modmenu.twitch=Twitch
+modmenu.wiki=Вікі
+modmenu.twitter=Х (Twitter)
+modmenu.youtube=YouTube
+
+modmenu.authors=Автори:
+modmenu.contributors=Дописувачі:
+
+modmenu.modsFolder=Відкрити теку модів
+modmenu.configsFolder=Відкрити теку налаштувань
+
+modmenu.nameTranslation.minecraft=Better than Adventure!
+modmenu.descriptionTranslation.minecraft=Усталена гра.
+modmenu.nameTranslation.fabricloader=Завантажувач Fabric
+modmenu.descriptionTranslation.fabricloader=Усталений завантажувач модів.
+modmenu.nameTranslation.java=Java
+modmenu.descriptionTranslation.java=Середовище виконання Java.
+modmenu.javaDistributionName=Запуск: %s
+
+modmenu.options=Налаштування Mod Menu
+option.modmenu.sorting=Сортування
+option.modmenu.sorting.ascending=А-Я
+option.modmenu.sorting.descending=Я-А
+option.modmenu.show_libraries=Бібліотеки
+option.modmenu.show_libraries.true=Показано
+option.modmenu.show_libraries.false=Приховано
+option.modmenu.hide_config_buttons=Кнопки налашт.
+option.modmenu.hide_config_buttons.true=Приховано
+option.modmenu.hide_config_buttons.false=Показано
+option.modmenu.hide_badges=Значки модів
+option.modmenu.hide_badges.true=Приховано
+option.modmenu.hide_badges.false=Показано
+option.modmenu.hide_mod_links=Посилання
+option.modmenu.hide_mod_links.true=Приховано
+option.modmenu.hide_mod_links.false=Показано
+option.modmenu.hide_mod_credits=Згадки
+option.modmenu.hide_mod_credits.true=Приховано
+option.modmenu.hide_mod_credits.false=Показано
+option.modmenu.hide_mod_license=Ліцензія
+option.modmenu.hide_mod_license.true=Приховано
+option.modmenu.hide_mod_license.false=Показано
+option.modmenu.easter_eggs=Прихованки
+option.modmenu.easter_eggs.true=УВІМК.
+option.modmenu.easter_eggs.false=ВИМК.
+option.modmenu.mods_button_style=Головне меню
+option.modmenu.mods_button_style.insert=Окремо
+option.modmenu.mods_button_style.icon=Значок
+option.modmenu.game_menu_button_style=Ігрове меню
+option.modmenu.game_menu_button_style.insert=Окремо
+option.modmenu.game_menu_button_style.icon=Значок
+option.modmenu.random_java_colors=Колір Java
+option.modmenu.random_java_colors.true=Постачальник
+option.modmenu.random_java_colors.false=Червоний
+option.modmenu.translate_names=Назви
+option.modmenu.translate_names.true=Перекладено
+option.modmenu.translate_names.false=Не перекладено
+option.modmenu.translate_descriptions=Описи
+option.modmenu.translate_descriptions.true=Перекладено
+option.modmenu.translate_descriptions.false=Не перекладено
+option.modmenu.quick_configure=Швидке налаштування
+option.modmenu.quick_configure.true=УВІМК.
+option.modmenu.quick_configure.false=ВИМК.

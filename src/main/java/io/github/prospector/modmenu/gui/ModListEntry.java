@@ -31,7 +31,6 @@ import java.nio.file.Path;
 import java.util.Objects;
 
 public class ModListEntry extends AlwaysSelectedEntryListWidget.Entry<ModListEntry> {
-	public static final String UNKNOWN_ICON = "/assets/modmenu/unknown_icon.png";
 	private static final Logger LOGGER = LoggerFactory.getLogger(ModMenu.MOD_ID);
 
 	protected final Minecraft client;
@@ -187,38 +186,42 @@ public class ModListEntry extends AlwaysSelectedEntryListWidget.Entry<ModListEnt
 
 	private BufferedImage createIcon() {
 		try {
-			Path path = container.getPath(metadata.getIconPath(0).orElse("assets/" + metadata.getId() + "/icon.png"));
-			BufferedImage cached = this.list.getCachedModIcon(path);
+			Path path = container.findPath(metadata.getIconPath(0).orElse("assets/" + metadata.getId() + "/icon.png")).orElse(null);
+			BufferedImage cached = path != null ? this.list.getCachedModIcon(path) : null;
 			if (cached != null) {
 				return cached;
 			}
-			if (!Files.exists(path)) {
+			if (path == null || !Files.exists(path)) {
 				ModContainer modMenu = FabricLoader.getInstance().getModContainer(ModMenu.MOD_ID).orElseThrow(IllegalAccessError::new);
+				String icon;
 				if (metadata.getId().equals("minecraft")) {
-					path = modMenu.getPath("assets/" + ModMenu.MOD_ID + "/mc_icon.png");
+					icon = "assets/" + ModMenu.MOD_ID + "/mc_icon.png";
 				} else if (metadata.getId().equals("java")) {
-					path = modMenu.getPath("assets/" + ModMenu.MOD_ID + "/java_icon.png");
+					icon = "assets/" + ModMenu.MOD_ID + "/java_icon.png";
 				} else {
-					path = modMenu.getPath("assets/" + ModMenu.MOD_ID + "/unknown_icon.png");
+					icon = "assets/" + ModMenu.MOD_ID + "/unknown_icon.png";
+				}
+				path = modMenu.findPath(icon).orElse(null);
+			}
+			if (path != null) {
+				cached = this.list.getCachedModIcon(path);
+				if (cached != null) {
+					return cached;
+				}
+				try (InputStream inputStream = Files.newInputStream(path)) {
+					BufferedImage image = ImageIO.read(Objects.requireNonNull(inputStream));
+					if (image.getHeight() != image.getWidth())
+						throw new IllegalStateException("Must be square icon");
+					this.list.cacheModIcon(path, image);
+					return image;
 				}
 			}
-			cached = this.list.getCachedModIcon(path);
-			if (cached != null) {
-				return cached;
-			}
-			try (InputStream inputStream = Files.newInputStream(path)) {
-				BufferedImage image = ImageIO.read(Objects.requireNonNull(inputStream));
-				if (image.getHeight() != image.getWidth())
-					throw new IllegalStateException("Must be square icon");
-				this.list.cacheModIcon(path, image);
-				return image;
-			}
-
 		} catch (Throwable t) {
 			LOGGER.error("Invalid icon for mod {}", this.container.getMetadata().getName(), t);
 			return null;
 		}
-	}
+        return null;
+    }
 
 	@Override
 	public void mouseClicked(int v, int v1, int i) {
@@ -250,7 +253,7 @@ public class ModListEntry extends AlwaysSelectedEntryListWidget.Entry<ModListEnt
 			if (icon != null) {
 				this.iconLocation = this.client.textureManager.loadBufferedTexture(icon).id();
 			} else {
-				this.iconLocation = this.client.textureManager.loadTexture(UNKNOWN_ICON).id();
+				this.iconLocation = this.client.textureManager.loadTexture("/assets/modmenu/unknown_icon.png").id();
 			}
 		}
 		this.client.textureManager.bindTexture(this.iconLocation);
