@@ -3,10 +3,7 @@ package io.github.prospector.modmenu.gui;
 import io.github.prospector.modmenu.ModMenu;
 import io.github.prospector.modmenu.config.ModMenuConfig;
 import io.github.prospector.modmenu.config.ModMenuConfigManager;
-import io.github.prospector.modmenu.util.BadgeRenderer;
-import io.github.prospector.modmenu.util.ButtonUtil;
-import io.github.prospector.modmenu.util.DrawingUtil;
-import io.github.prospector.modmenu.util.RenderUtils;
+import io.github.prospector.modmenu.util.*;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.metadata.ModMetadata;
 import net.fabricmc.loader.api.metadata.Person;
@@ -32,6 +29,7 @@ import org.spongepowered.include.com.google.common.base.Joiner;
 import java.io.File;
 import java.text.NumberFormat;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class ModListScreen extends Screen {
 	private static final String FILTERS_BUTTON_LOCATION = "/assets/" + ModMenu.MOD_ID + "/textures/gui/filters_button.png";
@@ -58,6 +56,7 @@ public class ModListScreen extends Screen {
 
 	ModMenuConfig config = ModMenuConfigManager.getConfig();
 	I18n i18n = I18n.getInstance();
+	FabricLoader loader = FabricLoader.getInstance();
 
 	private static final int CONFIGURE_BUTTON_ID = 0;
 	private static final int WEBSITE_BUTTON_ID = 1;
@@ -98,7 +97,6 @@ public class ModListScreen extends Screen {
 	@Override
 	public void init() {
 		Keyboard.enableRepeatEvents(true);
-		FontRenderer font = this.fontRenderer;
 		paneY = 48;
 		paneWidth = this.width / 2 - 8;
 		rightPaneX = width - paneWidth;
@@ -165,7 +163,7 @@ public class ModListScreen extends Screen {
 		int sortingWidth = fontRenderer.stringWidth(sortingText) + 20;
 		int filtersX;
 		int filtersWidth = showLibrariesWidth + sortingWidth + 2;
-		if ((filtersWidth + fontRenderer.stringWidth(i18n.translateKeyAndFormat("modmenu.showingMods", NumberFormat.getInstance().format(modList.getDisplayedCount()) + "/" + NumberFormat.getInstance().format(FabricLoader.getInstance().getAllMods().size()))) + 20) >= searchBoxX + searchBoxWidth + 22) {
+		if ((filtersWidth + fontRenderer.stringWidth(i18n.translateKeyAndFormat("modmenu.showingMods", NumberFormat.getInstance().format(modList.getDisplayedCount()) + "/" + NumberFormat.getInstance().format(loader.getAllMods().size()))) + 20) >= searchBoxX + searchBoxWidth + 22) {
 			filtersX = paneWidth / 2 - filtersWidth / 2;
 			showModCount = false;
 		} else {
@@ -250,7 +248,7 @@ public class ModListScreen extends Screen {
 				break;
 			}
 			case MODS_FOLDER_BUTTON_ID: {
-				File modsFolder = new File(FabricLoader.getInstance().getGameDir().toFile(), "mods");
+				File modsFolder = new File(loader.getGameDir().toFile(), "mods");
 				if (!modsFolder.exists()) {
 					modsFolder.mkdirs();
 				}
@@ -338,7 +336,12 @@ public class ModListScreen extends Screen {
 		this.drawStringCenteredNoShadow(font, this.textTitle, this.modList.getWidth() / 2, 8, 0xffffff);
 		super.render(mouseX, mouseY, delta);
 		if (showModCount || !filterOptionsShown) {
-			String showModCountString = i18n.translateKeyAndFormat("modmenu.showingMods", NumberFormat.getInstance().format(modList.getDisplayedCount()) + "/" + NumberFormat.getInstance().format(FabricLoader.getInstance().getAllMods().size()));
+			String showModCountString;
+			if (config.getShowLibraries() && modList.getDisplayedCount() == 0) {
+				showModCountString = computeLibraryCountText(false);
+			} else {
+				showModCountString = computeModCountText(true, false);
+			}
 			this.drawStringNoShadow(font, showModCountString, searchBoxX, 52, 0xFFFFFF);
 		}
 		if (selectedEntry != null) {
@@ -463,6 +466,54 @@ public class ModListScreen extends Screen {
 		}
 	}
 
+	private int[] formatModCount(Set<String> set, boolean allVisible) {
+		int visible = this.modList.getDisplayedCountFor(set);
+		int total = set.size();
+		if (visible == total || allVisible) {
+			return new int[]{total};
+		} else {
+			return new int[]{visible, total};
+		}
+	}
+
+	private String computeModCountText(boolean includeLibs, boolean onInit) {
+		Set<String> rootModIds = loader.getAllMods().stream()
+				.map(container -> container.getMetadata().getId())
+				.filter(id -> !ModMenu.LIBRARY_MODS.contains(id))
+				.collect(Collectors.toSet());
+
+		int[] rootMods = formatModCount(rootModIds, onInit);
+
+		if (includeLibs && !onInit && config.getShowLibraries()) {
+			Set<String> rootLibIds = loader.getAllMods().stream()
+					.map(container -> container.getMetadata().getId())
+					.filter(ModMenu.LIBRARY_MODS::contains)
+					.collect(Collectors.toSet());
+
+			int[] rootLibs = formatModCount(rootLibIds, false);
+
+			if (rootLibs.length == 1 && rootLibs[0] != 0 || rootLibs.length == 2 && rootLibs[1] != 0) {
+				return TranslationUtil.translateNumeric("modmenu.showingModsLibraries", rootMods, rootLibs);
+			}
+		}
+
+		return TranslationUtil.translateNumeric("modmenu.showingMods", rootMods);
+	}
+
+	private String computeLibraryCountText(boolean onInit) {
+		if (!onInit && config.getShowLibraries()) {
+			Set<String> rootLibIds = loader.getAllMods().stream()
+					.map(container -> container.getMetadata().getId())
+					.filter(ModMenu.LIBRARY_MODS::contains)
+					.collect(Collectors.toSet());
+
+			int[] rootLibs = formatModCount(rootLibIds, false);
+			return TranslationUtil.translateNumeric("modmenu.showingLibraries", rootLibs);
+		} else {
+			return "";
+		}
+	}
+
 	public double getScrollPercent() {
 		return scrollPercent;
 	}
@@ -475,14 +526,8 @@ public class ModListScreen extends Screen {
 		return searchBox.getText();
 	}
 
-	public boolean showingFilterOptions() {
-		return filterOptionsShown;
-	}
-
 	public void renderTooltip(List<String> list, int i, int j) {
 		if (!list.isEmpty()) {
-			FontRenderer font = this.fontRenderer;
-
 			GLRenderer.pushFrame();
 			GLRenderer.disableState(State.DEPTH_TEST);
 			int k = 0;

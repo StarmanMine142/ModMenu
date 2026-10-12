@@ -71,7 +71,8 @@ public class ModMenu implements ModInitializer {
 	@Override
 	public void onInitialize() {
 		ModMenuConfigManager.initializeConfig();
-		FabricLoader.getInstance().getEntrypointContainers("modmenu", ModMenuApi.class).forEach(entrypoint -> {
+		FabricLoader loader = FabricLoader.getInstance();
+		loader.getEntrypointContainers("modmenu", ModMenuApi.class).forEach(entrypoint -> {
 			ModMenuApi api = entrypoint.getEntrypoint();
 			ModContainer mod = entrypoint.getProvider();
             try {
@@ -85,7 +86,7 @@ public class ModMenu implements ModInitializer {
             });
         });
 		configScreenFactories.put("minecraft", (screenBase -> new ScreenOptions(screenBase, OptionsPages.GENERAL)));
-		Collection<ModContainer> mods = FabricLoader.getInstance().getAllMods();
+		Collection<ModContainer> mods = loader.getAllMods();
 		for (ModContainer mod : mods) {
 			ModMetadata metadata = mod.getMetadata();
 			String id = metadata.getId();
@@ -120,7 +121,7 @@ public class ModMenu implements ModInitializer {
 			if (metadata.containsCustomValue("modmenu:parent")) {
 				String parentId = metadata.getCustomValue("modmenu:parent").getAsString();
 				if (parentId != null) {
-					Optional<ModContainer> parent = FabricLoader.getInstance().getModContainer(parentId);
+					Optional<ModContainer> parent = loader.getModContainer(parentId);
 					parent.ifPresent(modContainer -> {
 						final List<ModContainer> list = PARENT_MAP.computeIfAbsent(modContainer, k -> new ArrayList<>());
 						list.add(mod);

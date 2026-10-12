@@ -267,12 +267,10 @@ public class ModListWidget extends AlwaysSelectedEntryListWidget<ModListEntry> i
 	}
 
 	@Override
-	public boolean mouseScrolled(double mouseX, double mouseY, double scrollDelta) {
+	public void mouseScrolled(double mouseX, double mouseY, double scrollDelta) {
 		if (this.isMouseOver(mouseX, mouseY)) {
 			setScrollAmount(getScrollAmount() - scrollDelta * 20.0);
-			return true;
 		}
-		return false;
 	}
 
 	public final ModListEntry getEntryAtPos(double x, double y) {
@@ -330,7 +328,13 @@ public class ModListWidget extends AlwaysSelectedEntryListWidget<ModListEntry> i
 		this.modIconsCache.put(path, tex);
 	}
 
-	public Set<ModContainer> getCurrentModSet() {
-		return addedMods;
+	public int getDisplayedCountFor(Set<String> set) {
+		int count = 0;
+		for (ModListEntry c : children()) {
+			if (set.contains(c.getMetadata().getId())) {
+				count++;
+			}
+		}
+		return count;
 	}
 }

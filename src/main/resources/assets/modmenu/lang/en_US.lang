@@ -1,17 +1,81 @@
 modmenu.title=Mods
+modmenu.nameTranslation.modmenu=Mod Menu
+modmenu.descriptionTranslation.modmenu=Adds a mod menu to view the list of mods you have installed.
+
 modmenu.loaded=(%s Loaded)
-modmenu.config=Edit Config
-modmenu.modsFolder=Open Mods Folder
-modmenu.configsFolder=Open Configs Folder
-modmenu.configure=Configure...
+
+modmenu.search=Search for mods
+modmenu.searchTerms.library=api library
+modmenu.searchTerms.clientside=clientside gameside
+modmenu.searchTerms.deprecated=deprecated outdated old
+modmenu.searchTerms.patchwork=patchwork forge fml
+modmenu.searchTerms.configurable=configurations configs configures configurable options settings
+
+modmenu.toggleFilterOptions=Toggle Filter Options
+modmenu.showingMods.n=Showing %s mods
+modmenu.showingMods.1=Showing %s mod
+modmenu.showingLibraries.n=Showing %s libraries
+modmenu.showingLibraries.1=Showing %s library
+modmenu.showingModsLibraries.n.n=Showing %s mods and %s libraries
+modmenu.showingModsLibraries.n.1=Showing %s mods and %s library
+modmenu.showingModsLibraries.1.n=Showing %s mod and %s libraries
+modmenu.showingModsLibraries.1.1=Showing %s mod and %s library
+
+modmenu.badge.clientsideOnly=Client
+modmenu.badge.library=Library
+modmenu.badge.deprecated=Deprecated
+modmenu.badge.minecraft=Minecraft
+modmenu.badge.forge=Forge
+
 modmenu.modIdToolTip=Mod ID: %s
+modmenu.authorPrefix=By %s
+modmenu.config=Edit Config
+modmenu.configure=Configure...
 modmenu.website=Website
 modmenu.issues=Issues
-modmenu.authorPrefix=By %s
+
+modmenu.credits=Credits:
+modmenu.viewCredits=View Credits
 modmenu.license=License:
-modmenu.search=Search for mods
-modmenu.toggleFilterOptions=Toggle Filter Options
-modmenu.showingMods=Showing %s Mods
+modmenu.links=Links:
+modmenu.sources=Source
+
+modmenu.bluesky=Bluesky
+modmenu.buymeacoffee=Buy Me a Coffee
+modmenu.coindrop=Coindrop
+modmenu.crowdin=Crowdin
+modmenu.curseforge=CurseForge
+modmenu.discord=Discord
+modmenu.donate=Donate
+modmenu.flattr=Flattr
+modmenu.github_releases=GitHub Releases
+modmenu.github_sponsors=GitHub Sponsors
+modmenu.kofi=Ko-fi
+modmenu.liberapay=Liberapay
+modmenu.mastodon=Mastodon
+modmenu.modrinth=Modrinth
+modmenu.opencollective=Open Collective
+modmenu.patreon=Patreon
+modmenu.paypal=PayPal
+modmenu.reddit=Reddit
+modmenu.twitch=Twitch
+modmenu.wiki=Wiki
+modmenu.twitter=X (Twitter)
+modmenu.youtube=YouTube
+
+modmenu.authors=Authors:
+modmenu.contributors=Contributors:
+
+modmenu.modsFolder=Open Mods Folder
+modmenu.configsFolder=Open Configs Folder
+
+modmenu.nameTranslation.minecraft=Better than Adventure!
+modmenu.descriptionTranslation.minecraft=The base game.
+modmenu.nameTranslation.fabricloader=Fabric Loader
+modmenu.descriptionTranslation.fabricloader=The base mod loader.
+modmenu.nameTranslation.java=Java
+modmenu.descriptionTranslation.java=The Java runtime environment.
+modmenu.javaDistributionName=Running: %s
 
 modmenu.options=Mod Menu Options
 option.modmenu.sorting=Sort
@@ -56,55 +120,3 @@ option.modmenu.translate_descriptions.false=Not Localized
 option.modmenu.quick_configure=Quick Configure
 option.modmenu.quick_configure.true=Enabled
 option.modmenu.quick_configure.false=Disabled
-
-modmenu.credits=Credits:
-modmenu.authors=Authors:
-modmenu.contributors=Contributors:
-modmenu.viewCredits=View Credits
-
-modmenu.searchTerms.library=api library
-modmenu.searchTerms.clientside=clientside gameside
-modmenu.searchTerms.deprecated=deprecated outdated old
-modmenu.searchTerms.patchwork=patchwork forge fml
-modmenu.searchTerms.configurable=configurations configs configures configurable options settings
-
-modmenu.badge.clientsideOnly=Client
-modmenu.badge.library=Library
-modmenu.badge.deprecated=Deprecated
-modmenu.badge.minecraft=Minecraft
-modmenu.badge.forge=Forge
-
-modmenu.links=Links:
-modmenu.sources=Source
-modmenu.bluesky=Bluesky
-modmenu.buymeacoffee=Buy Me a Coffee
-modmenu.coindrop=Coindrop
-modmenu.crowdin=Crowdin
-modmenu.curseforge=CurseForge
-modmenu.discord=Discord
-modmenu.donate=Donate
-modmenu.flattr=Flattr
-modmenu.github_releases=GitHub Releases
-modmenu.github_sponsors=GitHub Sponsors
-modmenu.kofi=Ko-fi
-modmenu.liberapay=Liberapay
-modmenu.mastodon=Mastodon
-modmenu.modrinth=Modrinth
-modmenu.opencollective=Open Collective
-modmenu.patreon=Patreon
-modmenu.paypal=PayPal
-modmenu.reddit=Reddit
-modmenu.twitch=Twitch
-modmenu.wiki=Wiki
-modmenu.twitter=X (Twitter)
-modmenu.youtube=YouTube
-
-modmenu.nameTranslation.minecraft=Better than Adventure!
-modmenu.descriptionTranslation.minecraft=The base game.
-modmenu.nameTranslation.fabricloader=Fabric Loader
-modmenu.descriptionTranslation.fabricloader=The base mod loader.
-modmenu.nameTranslation.modmenu=Mod Menu
-modmenu.descriptionTranslation.modmenu=Adds a mod menu to view the list of mods you have installed.
-modmenu.nameTranslation.java=Java
-modmenu.descriptionTranslation.java=The Java runtime environment.
-modmenu.javaDistributionName=Running: %s

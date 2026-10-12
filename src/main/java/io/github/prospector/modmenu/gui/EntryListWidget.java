@@ -159,7 +159,6 @@ public abstract class EntryListWidget<E extends EntryListWidget.Entry<E>> extend
 	protected void renderHeader(int i, int j) {
 	}
 
-
 	public void renderBackground() {
 	}
 
