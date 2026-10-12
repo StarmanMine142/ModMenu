@@ -141,7 +141,7 @@ public class ModMenuConfigScreen extends Screen {
                 startY + 144,
                 buttonWidth,
                 buttonHeight,
-                config.getQuickConfigureDisplayString()
+                config.getUpdateCheckerDisplayString()
         ));
 
         this.add(new ButtonElement(
@@ -150,7 +150,25 @@ public class ModMenuConfigScreen extends Screen {
                 startY + 144,
                 buttonWidth,
                 buttonHeight,
-                config.getHideConfigButtonsDisplayString()
+                config.getButtonUpdateBadgeDisplayString()
+        ));
+
+        this.add(new ButtonElement(
+                114,
+                leftX,
+                startY + 168,
+                buttonWidth,
+                buttonHeight,
+                config.getQuickConfigureDisplayString()
+        ));
+
+        this.add(new ButtonElement(
+                115,
+                rightX,
+                startY + 168,
+                buttonWidth,
+                buttonHeight,
+                config.getUpdateChannelDisplayString()
         ));
 
 
@@ -177,51 +195,30 @@ public class ModMenuConfigScreen extends Screen {
     @Override
     protected void buttonClicked(ButtonElement button) {
         ModMenuConfig config = ModMenuConfigManager.getConfig();
+        String displayString = switch (button.id) {
+            case 100 -> { config.toggleSortMode(); yield config.getSortingDisplayString(); }
+            case 101 -> { config.toggleShowLibraries(); yield config.getShowLibrariesDisplayString(); }
+            case 102 -> { config.toggleModsButtonStyle(); yield config.getModsButtonStyleDisplayString(); }
+            case 103 -> { config.toggleGameMenuButtonStyle(); yield config.getGameMenuButtonStyleDisplayString(); }
+            case 104 -> { config.toggleHideModLinks(); yield config.getHideModLinksDisplayString(); }
+            case 105 -> { config.toggleHideModLicense(); yield config.getHideModLicenseDisplayString(); }
+            case 106 -> { config.toggleHideBadges(); yield config.getHideBadgesDisplayString(); }
+            case 107 -> { config.toggleHideModCredits(); yield config.getHideModCreditsDisplayString(); }
+            case 108 -> { config.toggleEasterEggs(); yield config.getEasterEggsDisplayString(); }
+            case 109 -> { config.toggleRandomJavaColors(); yield config.getRandomJavaColorsDisplayString(); }
+            case 110 -> { config.toggleTranslateNames(); yield config.getTranslateNamesDisplayString(); }
+            case 111 -> { config.toggleTranslateDescriptions(); yield config.getTranslateDescriptionsDisplayString(); }
+            case 112 -> { config.toggleUpdateChecker(); yield config.getUpdateCheckerDisplayString(); }
+            case 113 -> { config.toggleButtonUpdateBadge(); yield config.getButtonUpdateBadgeDisplayString(); }
+            case 114 -> { config.toggleQuickConfigure(); yield config.getQuickConfigureDisplayString(); }
+            case 115 -> { config.toggleUpdateChannel(); yield config.getUpdateChannelDisplayString(); }
 
-        if (button.id == 100) {
-            config.toggleSortMode();
-            button.displayString = config.getSortingDisplayString();
-        } else if (button.id == 101) {
-            config.toggleShowLibraries();
-            button.displayString = config.getShowLibrariesDisplayString();
-        } else if (button.id == 102) {
-            config.toggleModsButtonStyle();
-            button.displayString = config.getModsButtonStyleDisplayString();
-        } else if (button.id == 103) {
-            config.toggleGameMenuButtonStyle();
-            button.displayString = config.getGameMenuButtonStyleDisplayString();
-        } else if (button.id == 104) {
-            config.toggleHideModLinks();
-            button.displayString = config.getHideModLinksDisplayString();
-        } else if (button.id == 105) {
-            config.toggleHideModLicense();
-            button.displayString = config.getHideModLicenseDisplayString();
-        } else if (button.id == 106) {
-            config.toggleHideBadges();
-            button.displayString = config.getHideBadgesDisplayString();
-        } else if (button.id == 107) {
-            config.toggleHideModCredits();
-            button.displayString = config.getHideModCreditsDisplayString();
-        } else if (button.id == 108) {
-            config.toggleEasterEggs();
-            button.displayString = config.getEasterEggsDisplayString();
-        } else if (button.id == 109) {
-            config.toggleRandomJavaColors();
-            button.displayString = config.getRandomJavaColorsDisplayString();
-        } else if (button.id == 110) {
-            config.toggleTranslateNames();
-            button.displayString = config.getTranslateNamesDisplayString();
-        } else if (button.id == 111) {
-            config.toggleTranslateDescriptions();
-            button.displayString = config.getTranslateDescriptionsDisplayString();
-        } else if (button.id == 112) {
-            config.toggleQuickConfigure();
-            button.displayString = config.getQuickConfigureDisplayString();
-        } else if (button.id == 113) {
-            config.toggleHideConfigButtons();
-            button.displayString = config.getHideConfigButtonsDisplayString();
-        } else if (button.id == 200) {
-            this.closeAndReturn();
+            case 200 -> { this.closeAndReturn(); yield null; }
+            default -> null;
+        };
+
+        if (displayString != null) {
+            button.displayString = displayString;
         }
     }
 

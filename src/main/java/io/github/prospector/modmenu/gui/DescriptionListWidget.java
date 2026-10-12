@@ -1,8 +1,11 @@
 package io.github.prospector.modmenu.gui;
 
+import io.github.prospector.modmenu.ModMenu;
+import io.github.prospector.modmenu.api.UpdateInfo;
 import io.github.prospector.modmenu.config.ModMenuConfig;
 import io.github.prospector.modmenu.config.ModMenuConfigManager;
 import io.github.prospector.modmenu.util.RenderUtils;
+import io.github.prospector.modmenu.util.mod.Mod;
 import net.fabricmc.loader.api.metadata.ContactInformation;
 import net.fabricmc.loader.api.metadata.Person;
 import net.minecraft.client.Minecraft;
@@ -152,6 +155,45 @@ public class DescriptionListWidget extends EntryListWidget<DescriptionListWidget
 			links.remove("homepage");
 			links.remove("issues");
 
+			if (config.getUpdateChecker()) {
+				Mod mod = ModMenu.MODS.get(id);
+				if (mod != null) {
+					UpdateInfo updateInfo = mod.getUpdateInfo();
+					if (updateInfo != null && updateInfo.isUpdateAvailable()) {
+
+						children().add(new DescriptionEntry(""));
+
+						int index = 0;
+						for (String line : RenderUtils.INSTANCE.wrapStringToWidthAsList(textRenderer, i18n.translateKey("modmenu.hasUpdate"), getRowWidth() - 11)) {
+							DescriptionEntry entry = new DescriptionEntry(line);
+							if (index == 0) {
+								entry.setUpdateTextEntry();
+							}
+							children().add(entry);
+							index++;
+						}
+
+						for (String line : RenderUtils.INSTANCE.wrapStringToWidthAsList(textRenderer, i18n.translateKey("modmenu.experimental"), getRowWidth() - 16)) {
+							children().add(new DescriptionEntry("    " + TextFormatting.ORANGE + line));
+						}
+
+						String updateMessage = updateInfo.getUpdateMessage();
+						String downloadLink = updateInfo.getDownloadLink();
+						if (updateMessage == null) {
+							updateMessage = i18n.translateKey("modmenu.downloadLink" + TextFormatting.UNDERLINE + TextFormatting.BLUE);
+						}
+
+						for (String line : RenderUtils.INSTANCE.wrapStringToWidthAsList(textRenderer, updateMessage, getRowWidth() - 16)) {
+							if (downloadLink != null) {
+								children().add(new LinkEntry(line, downloadLink, 8));
+							} else {
+								children().add(new DescriptionEntry("    " + line));
+							}
+						}
+					}
+				}
+			}
+
 			if (!links.isEmpty() && !config.getHideModLinks()) {
 				children().add(new DescriptionEntry(""));
 
@@ -230,16 +272,34 @@ public class DescriptionListWidget extends EntryListWidget<DescriptionListWidget
 		parent.overlayBackground(left, y1, right, y2, 64, 64, 64, startAlpha, endAlpha);
 	}
 
-	protected class DescriptionEntry extends Entry<DescriptionEntry> {
+	protected static class DescriptionEntry extends Entry<DescriptionEntry> {
 		protected String text;
+		protected int indent;
+		public boolean updateTextEntry = false;
+
+		public DescriptionEntry(String text, int indent) {
+			this.text = text;
+			this.indent = indent;
+		}
 
 		public DescriptionEntry(String text) {
-			this.text = text;
+			this(text, 0);
+		}
+
+		public void setUpdateTextEntry() {
+			this.updateTextEntry = true;
 		}
 
 		@Override
 		public void render(int index, int y, int x, int itemWidth, int itemHeight, int mouseX, int mouseY, boolean isSelected, float delta) {
-			this.drawStringShadow(this.fontRenderer, text, x, y, 0xAAAAAA);
+			int renderX = x + indent;
+
+			if (updateTextEntry) {
+				UpdateAvailableBadge.renderBadge(renderX, y + 1);
+				renderX += 11;
+			}
+
+			this.drawStringShadow(this.fontRenderer, text, renderX, y, 0xAAAAAA);
 		}
 	}
 }

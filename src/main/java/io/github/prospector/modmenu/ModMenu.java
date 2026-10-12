@@ -5,6 +5,9 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import io.github.prospector.modmenu.api.ModMenuApi;
 import io.github.prospector.modmenu.config.ModMenuConfigManager;
+import io.github.prospector.modmenu.util.UpdateCheckerUtil;
+import io.github.prospector.modmenu.util.mod.FabricMod;
+import io.github.prospector.modmenu.util.mod.Mod;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
@@ -15,15 +18,18 @@ import net.minecraft.client.gui.Screen;
 import net.minecraft.client.gui.options.ScreenOptions;
 import net.minecraft.client.gui.options.data.OptionsPages;
 import net.minecraft.core.data.registry.Registries;
+import net.minecraft.core.lang.I18n;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.text.NumberFormat;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
 public class ModMenu implements ModInitializer {
 	public static final String MOD_ID = "modmenu";
+	public static final String GITHUB_REF = "Turnip-Labs/ModMenu";
 	static {
 		Registries.NAMESPACES.register(MOD_ID, MOD_ID);
 	}
@@ -38,6 +44,8 @@ public class ModMenu implements ModInitializer {
     public static final Map<String, Map<String, Map.Entry<Integer, Integer>>> CUSTOM_BADGE_MODS = new HashMap<>();
 	public static final Map<ModContainer, List<ModContainer>> PARENT_MAP = new HashMap<>();
 	private static Map<String, Function<Screen, ? extends Screen>> configScreenFactories = new HashMap<>();
+	public static final Map<String, Mod> MODS = new ConcurrentHashMap<>();
+	public static final boolean DEV_ENVIRONMENT = FabricLoader.getInstance().isDevelopmentEnvironment();
 
 	public static boolean hasConfigScreenFactory(String modid) {
 		return configScreenFactories.containsKey(modid);
@@ -51,6 +59,14 @@ public class ModMenu implements ModInitializer {
 	public static void openConfigScreen(String modid) {
 		Runnable opener = LEGACY_CONFIG_SCREEN_TASKS.get(modid);
 		if (opener != null) opener.run();
+	}
+
+	public static String createModsButtonText(boolean showCount) {
+		String baseText = I18n.getInstance().translateKey("modmenu.title");
+		if (showCount) {
+			return baseText + " " + I18n.getInstance().translateKeyAndFormat("modmenu.loaded", getFormattedModCount());
+		}
+		return baseText;
 	}
 
 	public static void addLegacyConfigScreenTask(String modid, Runnable task) {
@@ -75,10 +91,13 @@ public class ModMenu implements ModInitializer {
 		loader.getEntrypointContainers("modmenu", ModMenuApi.class).forEach(entrypoint -> {
 			ModMenuApi api = entrypoint.getEntrypoint();
 			ModContainer mod = entrypoint.getProvider();
-            try {
-                api.getClass().getDeclaredMethod("getConfigScreenFactory"); // Make sure the method is implemented
-                configScreenFactories.put(mod.getMetadata().getId(), api.getConfigScreenFactory());
-            } catch (NoSuchMethodException ignored) {}
+			try {
+				api.getClass().getDeclaredMethod("getModConfigScreenFactory");
+				var factory = api.getModConfigScreenFactory();
+				if (factory != null) {
+					configScreenFactories.put(mod.getMetadata().getId(), factory::create);
+				}
+			} catch (NoSuchMethodException ignored) {}
             api.attachCustomBadges((name, outlineColor, fillColor) -> {
                 Map<String, Map.Entry<Integer, Integer>> map = new HashMap<>();
                 map.put(name, new AbstractMap.SimpleEntry<>(outlineColor, fillColor));
@@ -90,6 +109,10 @@ public class ModMenu implements ModInitializer {
 		for (ModContainer mod : mods) {
 			ModMetadata metadata = mod.getMetadata();
 			String id = metadata.getId();
+
+			MODS.put(id, new FabricMod(mod));
+			UpdateCheckerUtil.checkForUpdates();
+
 			// API badges
 			if (metadata.containsCustomValue("modmenu:api") && metadata.getCustomValue("modmenu:api").getAsBoolean()) {
 				addLibraryMod(id);
@@ -136,6 +159,15 @@ public class ModMenu implements ModInitializer {
 				addLibraryMod(id);
 			}
 		}
+	}
+
+	public static boolean areModUpdatesAvailable() {
+		for (Mod mod : MODS.values()) {
+			if (mod.getUpdateInfo() != null && mod.getUpdateInfo().isUpdateAvailable()) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	public static String getFormattedModCount() {

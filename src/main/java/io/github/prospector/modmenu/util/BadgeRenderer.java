@@ -83,4 +83,8 @@ public class BadgeRenderer {
 	public ModMetadata getMetadata() {
 		return metadata;
 	}
+
+	public int getWidth() {
+		return badgeX - startX;
+	}
 }

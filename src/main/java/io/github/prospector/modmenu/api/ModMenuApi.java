@@ -1,47 +1,34 @@
 package io.github.prospector.modmenu.api;
 
 import io.github.prospector.modmenu.ModMenu;
+import io.github.prospector.modmenu.gui.ModListScreen;
+import io.github.prospector.modmenu.util.NullScreenFactory;
 import io.github.prospector.modmenu.util.TriConsumer;
 import net.minecraft.client.gui.Screen;
-import org.jetbrains.annotations.ApiStatus;
 
-import java.util.Optional;
-import java.util.function.Function;
-import java.util.function.Supplier;
+import java.util.Map;
 
+@SuppressWarnings("unused")
 public interface ModMenuApi {
 	/**
-	 * Replaced with {@link ModMenuApi#getConfigScreen(Screen)}, with
-	 * the ModMenuApi implemented onto a class that is added as an
-	 * entry point to your fabric mod metadata.
+	 * Used for creating a {@link Screen} instance of the Mod Menu
+	 * "Mods" screen
 	 *
-	 * @deprecated Will be removed in 1.15 snapshots.
+	 * @param previous The screen before opening
+	 * @return A "Mods" Screen
 	 */
-	@Deprecated
-	static void addConfigOverride(String modid, Runnable action) {
-		ModMenu.addLegacyConfigScreenTask(modid, action);
+	static Screen createModsScreen(Screen previous) {
+		return new ModListScreen(previous);
 	}
 
 	/**
-	 * Used to determine the owner of this API implementation.
+	 * Used for creating text just like what would appear
+	 * on a Mod Menu Mods button
 	 *
-	 * @deprecated This method is deprecated as Fabric Loader
-	 * itself provides provider info for entrypoints.
+	 * @return The text that would be displayed on a Mods button
 	 */
-	@Deprecated
-	String getModId();
-
-	/**
-	 * Replaced with {@link ModMenuApi#getConfigScreenFactory()}, which
-	 * now allows ModMenu to open the screen for you, rather than depending
-	 * on you to open it, and gets rid of the messy Optional->Supplier wrapping.
-	 *
-	 * @deprecated For internal use only.
-	 */
-	@Deprecated
-    @ApiStatus.Internal
-	default Optional<Supplier<Screen>> getConfigScreen(Screen screen) {
-		return Optional.empty();
+	static String createModsButtonText() {
+		return ModMenu.createModsButtonText(true);
 	}
 
 	/**
@@ -49,18 +36,53 @@ public interface ModMenuApi {
 	 * configuration button is selected on the mod menu screen. The
 	 * screen instance parameter is the active mod menu screen.
 	 *
-	 * @return A factory function for constructing config screen instances.
+	 * @return A factory for constructing config screen instances.
 	 */
-	default Function<Screen, ? extends Screen> getConfigScreenFactory() {
-		return screen -> getConfigScreen(screen).map(Supplier::get).orElse(null);
+	default ConfigScreenFactory<?> getModConfigScreenFactory() {
+		return new NullScreenFactory<>();
 	}
 
+	/**
+	 * Used for mods that have their own update checking logic.
+	 * By returning your own {@link UpdateChecker} instance, you can override ModMenus built-in update checking logic.
+	 *
+	 * @return An {@link UpdateChecker} or <code>null</code> if ModMenu should handle update checking.
+	 */
+	default UpdateChecker getUpdateChecker() {
+		return null;
+	}
 
-    /**
-     * Add custom badges for mods to use.
-     *
-     * @param consumer the consumer used to add new badges.
-     */
-    default void attachCustomBadges(TriConsumer<String, Integer, Integer> consumer) {
-    }
+	/**
+	 * Used to provide config screen factories for other mods. This takes second
+	 * priority to a mod's own config screen factory provider. For example, if
+	 * mod `xyz` supplies a config screen factory, mod `abc` providing a config
+	 * screen to `xyz` will be pointless, as the one provided by `xyz` will be
+	 * used.
+	 * <p>
+	 * This method is NOT meant to be used to add a config screen factory to
+	 * your own mod.
+	 *
+	 * @return a map of mod ids to screen factories.
+	 */
+	default Map<String, ConfigScreenFactory<?>> getProvidedConfigScreenFactories() {
+		return Map.of();
+	}
+
+	/**
+	 * Used to provide update checkers for other mods. A mod registering its own
+	 * update checker will take priority over any provided ones should both exist.
+	 *
+	 * @return a map of mod ids to update checkers.
+	 */
+	default Map<String, UpdateChecker> getProvidedUpdateCheckers() {
+		return Map.of();
+	}
+
+	/**
+	 * Add custom badges for mods to use.
+	 *
+	 * @param consumer the consumer used to add new badges.
+	 */
+	default void attachCustomBadges(TriConsumer<String, Integer, Integer> consumer) {
+	}
 }

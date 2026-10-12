@@ -1,12 +1,14 @@
 package io.github.prospector.modmenu.gui;
 
 import io.github.prospector.modmenu.ModMenu;
+import io.github.prospector.modmenu.api.UpdateInfo;
 import io.github.prospector.modmenu.config.ModMenuConfig;
 import io.github.prospector.modmenu.config.ModMenuConfigManager;
 import io.github.prospector.modmenu.gui.entries.ParentEntry;
 import io.github.prospector.modmenu.util.BadgeRenderer;
 import io.github.prospector.modmenu.util.DrawingUtil;
 import io.github.prospector.modmenu.util.RenderUtils;
+import io.github.prospector.modmenu.util.mod.Mod;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
 import net.fabricmc.loader.api.metadata.ModMetadata;
@@ -46,7 +48,7 @@ public class ModListEntry extends AlwaysSelectedEntryListWidget.Entry<ModListEnt
 		this.list = list;
 		this.metadata = container.getMetadata();
 		this.client = mc;
-	}
+    }
 
 	@Override
 	public void render(int index, int y, int x, int rowWidth, int rowHeight, int mouseX, int mouseY, boolean isSelected, float delta) {
@@ -126,7 +128,6 @@ public class ModListEntry extends AlwaysSelectedEntryListWidget.Entry<ModListEnt
 		FontRenderer font = this.fontRenderer;
 		trimmedName = ModListScreen.getString(fontRenderer, name, trimmedName, maxNameWidth);
 		this.drawStringNoShadow(font, trimmedName, x + 32 + 3, y + 1, 0xFFFFFF);
-		new BadgeRenderer(client, x + 32 + 3 + font.stringWidth(name) + 2, y, x + rowWidth, container, list.getParent()).draw(mouseX, mouseY);
 
 		String descKey = "modmenu.descriptionTranslation." + id;
 		String translatedDesc = i18n.translateKey(descKey);
@@ -142,6 +143,21 @@ public class ModListEntry extends AlwaysSelectedEntryListWidget.Entry<ModListEnt
 			String javaDist = i18n.translateKeyAndFormat("modmenu.javaDistributionName", vendor);
 			description = (description != null ? description : "") + "\n" + javaDist;
 		}
+
+		int currentX = x + 32 + 3 + font.stringWidth(trimmedName) + 2;
+
+		if (config.getUpdateChecker() && config.getButtonUpdateBadge()) {
+			Mod modInstance = ModMenu.MODS.get(id);
+			if (modInstance != null) {
+				UpdateInfo updateInfo = modInstance.getUpdateInfo();
+				if (updateInfo != null && updateInfo.isUpdateAvailable()) {
+					UpdateAvailableBadge.renderBadge(currentX, y + 1);
+					currentX += 12;
+				}
+			}
+		 }
+
+		new BadgeRenderer(client, currentX, y, x + rowWidth, container, list.getParent()).draw(mouseX, mouseY);
 
 		if (description != null) {
 			int textX = x + 32 + 3 + 4;

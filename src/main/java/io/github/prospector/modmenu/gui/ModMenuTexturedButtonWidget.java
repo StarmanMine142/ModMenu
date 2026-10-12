@@ -1,5 +1,7 @@
 package io.github.prospector.modmenu.gui;
 
+import io.github.prospector.modmenu.ModMenu;
+import io.github.prospector.modmenu.config.ModMenuConfigManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ButtonElement;
 import net.minecraft.client.render.font.FontRenderer;
@@ -79,6 +81,15 @@ public class ModMenuTexturedButtonWidget extends ButtonElement {
 			t.draw();
 
 			GLRenderer.popFrame();
+
+			if (this.id == 1000) {
+				if (ModMenuConfigManager.getConfig().getButtonUpdateBadge() && ModMenu.areModUpdatesAvailable()) {
+					UpdateAvailableBadge.renderBadge(
+							this.xPosition + this.width - 5,
+							this.yPosition - 3
+					);
+				}
+			}
 
 			this.mouseDragged(mc, mouseX, mouseY);
 			if (!this.enabled) {

@@ -19,7 +19,10 @@ public class ModMenuConfig {
 	private boolean randomJavaColors = true;
 	private boolean translateNames = true;
 	private boolean translateDescriptions = true;
+	private boolean updateChecker = true;
+	private boolean buttonUpdateBadge = true;
 	private boolean quickConfigure = true;
+	private UpdateChannel updateChannel = UpdateChannel.RELEASE;
 
 	public void toggleSortMode() {
 		this.sorting = next(this.sorting);
@@ -86,8 +89,23 @@ public class ModMenuConfig {
 		ModMenuConfigManager.save();
 	}
 
+	public void toggleUpdateChecker() {
+		this.updateChecker = !this.updateChecker;
+		ModMenuConfigManager.save();
+	}
+
+	public void toggleButtonUpdateBadge() {
+		this.buttonUpdateBadge = !this.buttonUpdateBadge;
+		ModMenuConfigManager.save();
+	}
+
 	public void toggleQuickConfigure() {
 		this.quickConfigure = !this.quickConfigure;
+		ModMenuConfigManager.save();
+	}
+
+	public void toggleUpdateChannel() {
+		this.updateChannel = next(this.updateChannel);
 		ModMenuConfigManager.save();
 	}
 
@@ -143,8 +161,20 @@ public class ModMenuConfig {
 		return translateDescriptions;
 	}
 
+	public boolean getUpdateChecker() {
+		return updateChecker;
+	}
+
+	public boolean getButtonUpdateBadge() {
+		return buttonUpdateBadge;
+	}
+
 	public boolean getQuickConfigure() {
 		return quickConfigure;
+	}
+
+	public UpdateChannel getUpdateChannel() {
+		return updateChannel;
 	}
 
 	public String getSortingDisplayString() {
@@ -199,8 +229,20 @@ public class ModMenuConfig {
 		return optionString("translate_descriptions", I18n.getInstance().translateKey("option.modmenu.translate_descriptions." + this.translateDescriptions));
 	}
 
+	public String getUpdateCheckerDisplayString() {
+		return optionString("update_checker", I18n.getInstance().translateKey("option.modmenu.update_checker." + this.updateChecker));
+	}
+
+	public String getButtonUpdateBadgeDisplayString() {
+		return optionString("button_update_badge", I18n.getInstance().translateKey("option.modmenu.button_update_badge." + this.buttonUpdateBadge));
+	}
+
 	public String getQuickConfigureDisplayString() {
 		return optionString("quick_configure", I18n.getInstance().translateKey("option.modmenu.quick_configure." + this.quickConfigure));
+	}
+
+	public String getUpdateChannelDisplayString() {
+		return optionString("update_channel", this.updateChannel.getName());
 	}
 
 	private static <T extends Enum<T>> T next(T current) {
@@ -264,6 +306,23 @@ public class ModMenuConfig {
 		final String key;
 
 		GameMenuButtonStyle(String key) {
+			this.key = key;
+		}
+
+		@Override
+		public String getKey() {
+			return key;
+		}
+	}
+
+	public enum UpdateChannel implements OptionEnum {
+		RELEASE("option.modmenu.update_channel.release"),
+		BETA("option.modmenu.update_channel.beta"),
+		ALPHA("option.modmenu.update_channel.alpha");
+
+		final String key;
+
+		UpdateChannel(String key) {
 			this.key = key;
 		}
 
