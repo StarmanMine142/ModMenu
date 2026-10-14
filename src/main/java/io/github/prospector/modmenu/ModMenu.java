@@ -4,11 +4,13 @@ import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import io.github.prospector.modmenu.api.ModMenuApi;
+import io.github.prospector.modmenu.config.ModMenuConfig;
 import io.github.prospector.modmenu.config.ModMenuConfigManager;
+import io.github.prospector.modmenu.util.TestModContainer;
 import io.github.prospector.modmenu.util.UpdateCheckerUtil;
 import io.github.prospector.modmenu.util.mod.FabricMod;
 import io.github.prospector.modmenu.util.mod.Mod;
-import net.fabricmc.api.ModInitializer;
+import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
 import net.fabricmc.loader.api.metadata.CustomValue;
@@ -27,7 +29,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
-public class ModMenu implements ModInitializer {
+public class ModMenu implements ClientModInitializer {
 	public static final String MOD_ID = "modmenu";
 	public static final String GITHUB_REF = "Turnip-Labs/ModMenu";
 	static {
@@ -39,13 +41,19 @@ public class ModMenu implements ModInitializer {
 	private static final Map<String, Runnable> LEGACY_CONFIG_SCREEN_TASKS = new HashMap<>();
 	public static final List<String> LIBRARY_MODS = new ArrayList<>();
 	public static final Set<String> CLIENTSIDE_MODS = new HashSet<>();
-    public static final Set<String> DEPRECATED_MODS = new HashSet<>();
+	public static final Set<String> DEPRECATED_MODS = new HashSet<>();
 	public static final Set<String> PATCHWORK_FORGE_MODS = new HashSet<>();
-    public static final Map<String, Map<String, Map.Entry<Integer, Integer>>> CUSTOM_BADGE_MODS = new HashMap<>();
+	public static final Map<String, Map<String, Map.Entry<Integer, Integer>>> CUSTOM_BADGE_MODS = new HashMap<>();
 	public static final Map<ModContainer, List<ModContainer>> PARENT_MAP = new HashMap<>();
-	private static Map<String, Function<Screen, ? extends Screen>> configScreenFactories = new HashMap<>();
+	private static final Map<String, Function<Screen, ? extends Screen>> configScreenFactories = new HashMap<>();
 	public static final Map<String, Mod> MODS = new ConcurrentHashMap<>();
 	public static final boolean DEV_ENVIRONMENT = FabricLoader.getInstance().isDevelopmentEnvironment();
+
+	private static int cachedDisplayedModCount = -1;
+
+	public static void invalidateCache() {
+		cachedDisplayedModCount = -1;
+	}
 
 	public static boolean hasConfigScreenFactory(String modid) {
 		return configScreenFactories.containsKey(modid);
@@ -61,12 +69,72 @@ public class ModMenu implements ModInitializer {
 		if (opener != null) opener.run();
 	}
 
-	public static String createModsButtonText(boolean showCount) {
-		String baseText = I18n.getInstance().translateKey("modmenu.title");
-		if (showCount) {
-			return baseText + " " + I18n.getInstance().translateKeyAndFormat("modmenu.loaded", getFormattedModCount());
+	public static String getDisplayedModCount() {
+		if (cachedDisplayedModCount == -1) {
+			ModMenuConfig config = ModMenuConfigManager.getConfig();
+			boolean includeChildren = config.getCountChildren();
+			boolean includeLibraries = config.getCountLibraries();
+			boolean includeHidden = config.getCountHiddenMods();
+
+			long count = MODS.values().stream().filter(mod -> {
+				boolean isChild = mod.getParent() != null;
+				if (!includeChildren && isChild) {
+					return false;
+				}
+
+				boolean isLibrary = ModMenu.LIBRARY_MODS.contains(mod.getId());
+				if (!includeLibraries && isLibrary) {
+					return false;
+				}
+
+				return includeHidden || !mod.isHidden();
+			}).count();
+
+			if (Boolean.getBoolean("modmenu.debug")) {
+				count += TestModContainer.getTestModContainers().size();
+			}
+
+			cachedDisplayedModCount = Math.toIntExact(count);
 		}
-		return baseText;
+		return NumberFormat.getInstance().format(cachedDisplayedModCount);
+	}
+
+	public static String createModsButtonText(boolean title) {
+		ModMenuConfig config = ModMenuConfigManager.getConfig();
+		var titleStyle = config.getModsButtonStyle();
+		var gameMenuStyle = config.getGameMenuButtonStyle();
+
+		boolean isIcon = title ?
+				titleStyle == ModMenuConfig.ModsButtonStyle.ICON :
+				gameMenuStyle == ModMenuConfig.GameMenuButtonStyle.ICON;
+
+		boolean isShort = title ?
+				titleStyle == ModMenuConfig.ModsButtonStyle.INSERT :
+				gameMenuStyle == ModMenuConfig.GameMenuButtonStyle.INSERT;
+
+		I18n i18n = I18n.getInstance();
+		String modsText = i18n.translateKey("modmenu.title");
+
+		if (config.getModCountLocation().isOnModsButton() && !isIcon) {
+			String count = getDisplayedModCount();
+			if (!isShort) {
+				modsText += " " + i18n.translateKeyAndFormat("modmenu.loaded", count);
+			} else {
+				String specificKey = "modmenu.loaded." + count;
+				String key;
+
+				String nKey = i18n.translateKey(specificKey);
+				boolean hasSpecific = !nKey.equals(specificKey);
+				key = hasSpecific ? specificKey : "modmenu.loaded";
+
+				String secretKey = specificKey + ".secret";
+				if (config.getEasterEggs() && !i18n.translateKey(secretKey).equals(secretKey)) {
+					key = secretKey;
+				}
+				modsText += " " + i18n.translateKeyAndFormat(key, count);
+			}
+		}
+		return modsText;
 	}
 
 	public static void addLegacyConfigScreenTask(String modid, Runnable task) {
@@ -83,9 +151,8 @@ public class ModMenu implements ModInitializer {
 		LIBRARY_MODS.add(modid);
 	}
 
-	@SuppressWarnings("RedundantCollectionOperation")
 	@Override
-	public void onInitialize() {
+	public void onInitializeClient() {
 		ModMenuConfigManager.initializeConfig();
 		FabricLoader loader = FabricLoader.getInstance();
 		loader.getEntrypointContainers("modmenu", ModMenuApi.class).forEach(entrypoint -> {
@@ -98,12 +165,12 @@ public class ModMenu implements ModInitializer {
 					configScreenFactories.put(mod.getMetadata().getId(), factory::create);
 				}
 			} catch (NoSuchMethodException ignored) {}
-            api.attachCustomBadges((name, outlineColor, fillColor) -> {
-                Map<String, Map.Entry<Integer, Integer>> map = new HashMap<>();
-                map.put(name, new AbstractMap.SimpleEntry<>(outlineColor, fillColor));
-                CUSTOM_BADGE_MODS.put(mod.getMetadata().getId(), map);
-            });
-        });
+			api.attachCustomBadges((name, outlineColor, fillColor) -> {
+				Map<String, Map.Entry<Integer, Integer>> map = new HashMap<>();
+				map.put(name, new AbstractMap.SimpleEntry<>(outlineColor, fillColor));
+				CUSTOM_BADGE_MODS.put(mod.getMetadata().getId(), map);
+			});
+		});
 		configScreenFactories.put("minecraft", (screenBase -> new ScreenOptions(screenBase, OptionsPages.GENERAL)));
 		Collection<ModContainer> mods = loader.getAllMods();
 		for (ModContainer mod : mods) {
@@ -128,9 +195,9 @@ public class ModMenu implements ModInitializer {
 			}
 
 			// Deprecated badges
-            if (metadata.containsCustomValue("modmenu:deprecated") && metadata.getCustomValue("modmenu:deprecated").getAsBoolean()) {
-                DEPRECATED_MODS.add(id);
-            }
+			if (metadata.containsCustomValue("modmenu:deprecated") && metadata.getCustomValue("modmenu:deprecated").getAsBoolean()) {
+				DEPRECATED_MODS.add(id);
+			}
 
 			// Patchwork (unused)
 			if (metadata.containsCustomValue("patchwork:source") && metadata.getCustomValue("patchwork:source").getAsObject() != null) {
@@ -168,9 +235,5 @@ public class ModMenu implements ModInitializer {
 			}
 		}
 		return false;
-	}
-
-	public static String getFormattedModCount() {
-		return NumberFormat.getInstance().format(FabricLoader.getInstance().getAllMods().size());
 	}
 }

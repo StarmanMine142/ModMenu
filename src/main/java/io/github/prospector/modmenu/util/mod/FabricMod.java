@@ -2,6 +2,8 @@ package io.github.prospector.modmenu.util.mod;
 
 import io.github.prospector.modmenu.api.UpdateChecker;
 import io.github.prospector.modmenu.api.UpdateInfo;
+import io.github.prospector.modmenu.config.ModMenuConfigManager;
+import io.github.prospector.modmenu.util.BadgeRenderer;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
 import net.fabricmc.loader.api.metadata.ModMetadata;
@@ -12,13 +14,16 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.MessageDigest;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 public class FabricMod implements Mod {
     private final ModMetadata metadata;
     private UpdateChecker updateChecker;
     private UpdateInfo updateInfo;
+    private final boolean allowsUpdateChecks = true;
 
     public FabricMod(ModContainer container) {
         this.metadata = container.getMetadata();
@@ -40,8 +45,27 @@ public class FabricMod implements Mod {
     }
 
     @Override
+    public @Nullable String getParent() {
+        return null;
+    }
+
+    @Override
+    public boolean isHidden() {
+        return ModMenuConfigManager.getConfig().getHiddenMods().contains(this.getId());
+    }
+
+    @Override
+    public @NotNull Set<BadgeRenderer> getBadges() {
+        return Collections.emptySet();
+    }
+
+    @Override
     public boolean allowsUpdateChecks() {
-        return true;
+        if (ModMenuConfigManager.getConfig().getDisableUpdateChecker().contains(this.getId())) {
+            return false;
+        } else {
+            return this.allowsUpdateChecks;
+        }
     }
 
     @Override

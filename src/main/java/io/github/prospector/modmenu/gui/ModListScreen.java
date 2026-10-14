@@ -385,7 +385,7 @@ public class ModListScreen extends Screen {
 			String versionString = metadata.getId().equals("minecraft")
 					? Global.VERSION
 					: metadata.getVersion().getFriendlyString();
-			this.drawStringNoShadow(font, "v" + versionString, x + imageOffset, paneY + 2 + lineSpacing, 0x808080);
+			this.drawStringNoShadow(font, VersionUtil.getPrefixedVersion(versionString), x + imageOffset, paneY + 2 + lineSpacing, 0x808080);
 			String authors;
 			List<String> names = new ArrayList<>();
 

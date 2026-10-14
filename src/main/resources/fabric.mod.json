@@ -7,7 +7,7 @@
   "license": "MIT",
   "icon": "assets/modmenu/icon.png",
   "entrypoints": {
-    "main": [
+    "client": [
       "io.github.prospector.modmenu.ModMenu"
     ],
     "modmenu": [

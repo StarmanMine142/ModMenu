@@ -9,7 +9,6 @@ import io.github.prospector.modmenu.gui.ModMenuTexturedButtonWidget;
 import net.minecraft.client.gui.ButtonElement;
 import net.minecraft.client.gui.Screen;
 import net.minecraft.client.gui.ScreenPause;
-import net.minecraft.core.lang.I18n;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -20,8 +19,7 @@ public class ScreenPauseMixin extends Screen {
 	@Inject(at = @At("RETURN"), method = "init")
 	public void modmenu$drawMenuButton(CallbackInfo info) {
 		if (ModMenuConfigManager.getConfig().getGameMenuButtonStyle() == ModMenuConfig.GameMenuButtonStyle.INSERT) {
-			I18n i18n = I18n.getInstance();
-			String buttonText = i18n.translateKey("modmenu.title") + " " + i18n.translateKeyAndFormat("modmenu.loaded", ModMenu.getFormattedModCount());
+			String buttonText = ModMenu.createModsButtonText(false);
 			this.buttons.add(new ModMenuButtonWidget(1000, this.width / 2 - 100, this.height / 4 + 72 - 16, 200, 20, buttonText));
 		} else {
 			this.buttons.removeIf(b -> b.id == 10);

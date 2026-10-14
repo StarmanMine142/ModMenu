@@ -149,9 +149,6 @@ public class UpdateCheckerUtil {
         return results;
     }
 
-    public static void triggerV2RemovedToast() {
-    }
-
     private static @Nullable Map<String, Instant> getCurrentVersions(Collection<String> modHashes) {
         String body = ModMenu.GSON.toJson(new CurrentVersionsFromHashes(modHashes));
 
@@ -280,8 +277,6 @@ public class UpdateCheckerUtil {
                             new VersionUpdate(projectId, versionId, versionNumber, date, updateChannel, versionHash)
                     );
                 }
-                LOGGER.info("Body sent to Modrinth: {}", body);
-                LOGGER.info("Modrinth response status: {}, body: {}", status, latestVersionsResponse.body());
 
                 return results;
             }
@@ -318,7 +313,6 @@ public class UpdateCheckerUtil {
 
     public static class LatestVersionsFromHashesBody {
         public Collection<String> hashes;
-        public String algorithm = "sha512";
         public Collection<String> loaders;
         @SerializedName("game_versions")
         public Collection<String> gameVersions;
