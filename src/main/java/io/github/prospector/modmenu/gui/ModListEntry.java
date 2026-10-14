@@ -5,9 +5,7 @@ import io.github.prospector.modmenu.api.UpdateInfo;
 import io.github.prospector.modmenu.config.ModMenuConfig;
 import io.github.prospector.modmenu.config.ModMenuConfigManager;
 import io.github.prospector.modmenu.gui.entries.ParentEntry;
-import io.github.prospector.modmenu.util.BadgeRenderer;
-import io.github.prospector.modmenu.util.DrawingUtil;
-import io.github.prospector.modmenu.util.RenderUtils;
+import io.github.prospector.modmenu.util.*;
 import io.github.prospector.modmenu.util.mod.Mod;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
@@ -20,6 +18,7 @@ import net.minecraft.client.render.renderer.Shaders;
 import net.minecraft.client.render.renderer.State;
 import net.minecraft.client.render.tessellator.TessellatorGeneral;
 import net.minecraft.client.render.window.CursorShape;
+import net.minecraft.core.Global;
 import net.minecraft.core.lang.I18n;
 import org.lwjgl.opengl.GL11;
 import org.slf4j.Logger;
@@ -39,6 +38,8 @@ public class ModListEntry extends AlwaysSelectedEntryListWidget.Entry<ModListEnt
 	protected final ModContainer container;
 	protected final ModMetadata metadata;
 	protected final ModListWidget list;
+	protected static final int FULL_ICON_SIZE = 32;
+	protected static final int COMPACT_ICON_SIZE = 19;
 	protected Integer iconLocation;
 
 	ModMenuConfig config = ModMenuConfigManager.getConfig();
@@ -48,7 +49,7 @@ public class ModListEntry extends AlwaysSelectedEntryListWidget.Entry<ModListEnt
 		this.list = list;
 		this.metadata = container.getMetadata();
 		this.client = mc;
-    }
+	}
 
 	@Override
 	public void render(int index, int y, int x, int rowWidth, int rowHeight, int mouseX, int mouseY, boolean isSelected, float delta) {
@@ -57,20 +58,20 @@ public class ModListEntry extends AlwaysSelectedEntryListWidget.Entry<ModListEnt
 
 		x += getXOffset();
 		rowWidth -= getXOffset();
+		int iconSize = config.getCompactList() ? COMPACT_ICON_SIZE : FULL_ICON_SIZE;
 
 		GLRenderer.pushFrame();
 
 		if ("java".equals(id)) {
-			DrawingUtil.drawRandomVersionBackground(container, x, y, 32, 32);
+			DrawingUtil.drawRandomVersionBackground(container, x, y, iconSize, iconSize);
 		}
 
-		GLRenderer.setColor4f(1, 1, 1, 1); // We LOVE random color calls
+		GLRenderer.setColor4f(1, 1, 1, 1);
 
 		this.bindIconTexture();
-		internalRender(y, x);
+		internalRender(y, x, iconSize);
 
 		if (!(this instanceof ParentEntry) && (ModMenu.hasConfigScreenFactory(id) || ModMenu.hasLegacyConfigScreenTask(id)) && config.getQuickConfigure()) {
-			int iconSize = 32;
 			boolean hovered = mouseX >= x && mouseY >= y && mouseX < x + rowWidth && mouseY < y + iconSize;
 
 			if (hovered) {
@@ -97,9 +98,10 @@ public class ModListEntry extends AlwaysSelectedEntryListWidget.Entry<ModListEnt
 
 				client.textureManager.bindTexture(client.textureManager.loadTexture("/assets/modmenu/textures/gui/mod_configuration.png"));
 
-				float vMin = hoveringIcon ? 32.0f / 256.0f : 0.0f;
-				float vMax = hoveringIcon ? 64.0f / 256.0f : 32.0f / 256.0f;
-				float uMax = 32.0f / 256.0f;
+				float maxUV = config.getCompactList() ? (int) (256 / (FULL_ICON_SIZE / (double) COMPACT_ICON_SIZE)) : 256;
+				float vMin = hoveringIcon ? iconSize / maxUV : 0.0f;
+				float vMax = hoveringIcon ? (iconSize * 2) / maxUV : iconSize / maxUV;
+				float uMax = iconSize / maxUV;
 
 				t.startDrawingQuads();
 				t.addVertexWithUV(x, y + iconSize, 0, 0.0f, vMax);
@@ -115,6 +117,8 @@ public class ModListEntry extends AlwaysSelectedEntryListWidget.Entry<ModListEnt
 			}
 		}
 
+		FontRenderer font = this.fontRenderer;
+
 		String translationKey = "modmenu.nameTranslation." + id;
 		String translatedName = i18n.translateKey(translationKey);
 		String name;
@@ -124,67 +128,56 @@ public class ModListEntry extends AlwaysSelectedEntryListWidget.Entry<ModListEnt
 			name = metadata.getName();
 		}
 		String trimmedName = name;
-		int maxNameWidth = rowWidth - 32 - 3;
-		FontRenderer font = this.fontRenderer;
-		trimmedName = ModListScreen.getString(fontRenderer, name, trimmedName, maxNameWidth);
-		this.drawStringNoShadow(font, trimmedName, x + 32 + 3, y + 1, 0xFFFFFF);
+		int maxNameWidth = rowWidth - iconSize - 3;
+		trimmedName = ModListScreen.getString(font, name, trimmedName, maxNameWidth);
+		this.drawStringNoShadow(font, trimmedName, x + iconSize + 3, y + 1, 0xFFFFFF);
 
-		String descKey = "modmenu.descriptionTranslation." + id;
-		String translatedDesc = i18n.translateKey(descKey);
-		String description;
-		if (!translatedDesc.equals(descKey) && config.getTranslateDescriptions()) {
-			description = translatedDesc;
-		} else {
-			description = metadata.getDescription();
-		}
-
-		if ("java".equals(id)) {
-			String vendor = System.getProperty("java.vendor", "Unknown Vendor");
-			String javaDist = i18n.translateKeyAndFormat("modmenu.javaDistributionName", vendor);
-			description = (description != null ? description : "") + "\n" + javaDist;
-		}
-
-		int currentX = x + 32 + 3 + font.stringWidth(trimmedName) + 2;
+		int badgeX = x + iconSize + 3 + font.stringWidth(trimmedName) + 2;
+		int updateBadgeOffset = 0;
 
 		if (config.getUpdateChecker() && config.getButtonUpdateBadge()) {
 			Mod modInstance = ModMenu.MODS.get(id);
 			if (modInstance != null) {
 				UpdateInfo updateInfo = modInstance.getUpdateInfo();
 				if (updateInfo != null && updateInfo.isUpdateAvailable()) {
-					UpdateAvailableBadge.renderBadge(currentX, y + 1);
-					currentX += 12;
+					UpdateAvailableBadge.renderBadge(badgeX, y);
+					updateBadgeOffset = 11;
 				}
 			}
-		 }
+		}
 
-		new BadgeRenderer(client, currentX, y, x + rowWidth, container, list.getParent()).draw(mouseX, mouseY);
+		new BadgeRenderer(client, badgeX + updateBadgeOffset, y, x + rowWidth, container, list.getParent()).draw(mouseX, mouseY);
 
-		if (description != null) {
-			int textX = x + 32 + 3 + 4;
-			int textY = y + 9 + 2;
-			int maxWidth = rowWidth - 32 - 7;
-			int maxLines = 2;
-			int currentLine = 0;
+		int lineHeight = 9;
+		if (config.getCompactList()) {
+			String versionString = "minecraft".equals(id) ? Global.VERSION : metadata.getVersion().getFriendlyString();
+			String prefixedVersion = VersionUtil.getPrefixedVersion(versionString);
+			RenderUtils.INSTANCE.drawWrappedString(this, prefixedVersion, x + iconSize + 3, y + lineHeight + 2, rowWidth - iconSize - 7, 2, 0x808080);
+		} else {
+			String descKey = "modmenu.descriptionTranslation." + id;
+			String translatedDesc = i18n.translateKey(descKey);
+			String description;
+			if (!translatedDesc.equals(descKey) && config.getTranslateDescriptions()) {
+				description = translatedDesc;
+			} else {
+				description = metadata.getDescription();
+			}
 
+			if ("java".equals(id)) {
+				String vendor = System.getProperty("java.vendor", "Unknown Vendor");
+				String javaDist = i18n.translateKeyAndFormat("modmenu.javaDistributionName", vendor);
+				description = (description != null ? description : "") + "\n" + javaDist;
+			}
 
-			String[] paragraphs = description.split("\r?\n");
-
-			for (String paragraph : paragraphs) {
-				if (currentLine >= maxLines) break;
-
-				for (String line : RenderUtils.INSTANCE.wrapStringToWidthAsList(font, paragraph, maxWidth)) {
-					if (currentLine >= maxLines) break;
-
-					this.drawStringNoShadow(font, line, textX, textY + (currentLine * 9), 0x808080);
-					currentLine++;
-				}
+			if (description != null) {
+				RenderUtils.INSTANCE.drawWrappedString(this, description, x + iconSize + 3 + 4, y + lineHeight + 2, rowWidth - iconSize - 7, 2, 0x808080);
 			}
 		}
 
 		GLRenderer.popFrame();
 	}
 
-	static void internalRender(int y, int x) {
+	static void internalRender(int y, int x, int iconSize) {
 		GLRenderer.pushFrame();
 		GLRenderer.setShader(Shaders.INTERFACE);
 		GLRenderer.enableState(State.BLEND);
@@ -192,9 +185,9 @@ public class ModListEntry extends AlwaysSelectedEntryListWidget.Entry<ModListEnt
 		TessellatorGeneral t = GLRenderer.getTessellator();
 		t.startDrawingQuads();
 		t.addVertexWithUV(x, y, 0, 0, 0);
-		t.addVertexWithUV(x, y + 32, 0, 0, 1);
-		t.addVertexWithUV(x + 32, y + 32, 0, 1, 1);
-		t.addVertexWithUV(x + 32, y, 0, 1, 0);
+		t.addVertexWithUV(x, y + iconSize, 0, 0, 1);
+		t.addVertexWithUV(x + iconSize, y + iconSize, 0, 1, 1);
+		t.addVertexWithUV(x + iconSize, y, 0, 1, 0);
 		t.draw();
 
 		GLRenderer.popFrame();
@@ -236,8 +229,8 @@ public class ModListEntry extends AlwaysSelectedEntryListWidget.Entry<ModListEnt
 			LOGGER.error("Invalid icon for mod {}", this.container.getMetadata().getName(), t);
 			return null;
 		}
-        return null;
-    }
+		return null;
+	}
 
 	@Override
 	public void mouseClicked(int v, int v1, int i) {
@@ -246,8 +239,9 @@ public class ModListEntry extends AlwaysSelectedEntryListWidget.Entry<ModListEnt
 		if (i == 0 && !(this instanceof ParentEntry)) {
 			String id = metadata.getId();
 			if (ModMenu.hasConfigScreenFactory(id) || ModMenu.hasLegacyConfigScreenTask(id) && config.getQuickConfigure()) {
+				int iconSize = config.getCompactList() ? COMPACT_ICON_SIZE : FULL_ICON_SIZE;
 				int iconLeft = getXOffset();
-				if (v >= iconLeft && v < iconLeft + 32 && v1 >= 0 && v1 < 32) {
+				if (v >= iconLeft && v < iconLeft + iconSize && v1 >= 0 && v1 < iconSize) {
 					final Screen screen = ModMenu.getConfigScreen(id, list.getParent());
 					if (screen != null) {
 						client.displayScreen(screen);

@@ -31,15 +31,16 @@ public class ModMenuConfigScreen extends Screen {
 
         int y = 40;
         y = addRow(100, config.getSortingDisplayString(), 101, config.getCountLibrariesDisplayString(), y);
-        y = addRow(102, config.getCountChildrenDisplayString(), 103, config.getModsButtonStyleDisplayString(), y);
-        y = addRow(104, config.getGameMenuButtonStyleDisplayString(), 105, config.getCountHiddenModsDisplayString(), y);
-        y = addRow(106, config.getModCountLocationDisplayString(), 107, config.getHideModLinksDisplayString(), y);
-        y = addRow(108, config.getShowLibrariesDisplayString(), 109, config.getHideModLicenseDisplayString(), y);
-        y = addRow(110, config.getHideBadgesDisplayString(), 111, config.getHideModCreditsDisplayString(), y);
-        y = addRow(112, config.getRandomJavaColorsDisplayString(), 113, config.getEasterEggsDisplayString(), y);
-        y = addRow(114, config.getTranslateNamesDisplayString(), 115, config.getTranslateDescriptionsDisplayString(), y);
-        y = addRow(116, config.getUpdateCheckerDisplayString(), 117, config.getButtonUpdateBadgeDisplayString(), y);
-        y = addRow(118, config.getQuickConfigureDisplayString(), 119, config.getUpdateChannelDisplayString(), y);
+        y = addRow(102, config.getCompactListDisplayString(), 103, config.getCountChildrenDisplayString(), y);
+        y = addRow(104, config.getModsButtonStyleDisplayString(), 105, config.getGameMenuButtonStyleDisplayString(), y);
+        y = addRow(106, config.getCountHiddenModsDisplayString(), 107, config.getModCountLocationDisplayString(), y);
+        y = addRow(108, config.getHideModLinksDisplayString(), 109, config.getShowLibrariesDisplayString(), y);
+        y = addRow(110, config.getHideModLicenseDisplayString(), 111, config.getHideBadgesDisplayString(), y);
+        y = addRow(112, config.getHideModCreditsDisplayString(), 113, config.getEasterEggsDisplayString(), y);
+        y = addRow(114, config.getRandomJavaColorsDisplayString(), 115, config.getTranslateNamesDisplayString(), y);
+        y = addRow(116, config.getTranslateDescriptionsDisplayString(), 117, config.getUpdateCheckerDisplayString(), y);
+        y = addRow(118, config.getButtonUpdateBadgeDisplayString(), 119, config.getUpdateChannelDisplayString(), y);
+        y = addRow(120, config.getQuickConfigureDisplayString(), y);
 
         contentHeight = y + 6;
         this.add(new ButtonElement(200, (this.width - 200) / 2, this.height - 32, 200, 20, I18n.getInstance().translateKey("gui.options.button.done")));
@@ -200,24 +201,25 @@ public class ModMenuConfigScreen extends Screen {
         switch (button.id) {
             case 100: config.toggleSortMode(); string = config.getSortingDisplayString(); break;
             case 101: config.toggleCountLibraries(); string = config.getCountLibrariesDisplayString(); break;
-            case 102: config.toggleCountChildren(); string = config.getCountChildrenDisplayString(); break;
-            case 103: config.toggleModsButtonStyle(); string = config.getModsButtonStyleDisplayString(); break;
-            case 104: config.toggleGameMenuButtonStyle(); string = config.getGameMenuButtonStyleDisplayString(); break;
-            case 105: config.toggleCountHiddenMods(); string = config.getCountHiddenModsDisplayString(); break;
-            case 106: config.toggleModCountLocation(); string = config.getModCountLocationDisplayString(); break;
-            case 107: config.toggleHideModLinks(); string = config.getHideModLinksDisplayString(); break;
-            case 108: config.toggleShowLibraries(); string = config.getShowLibrariesDisplayString(); break;
-            case 109: config.toggleHideModLicense(); string = config.getHideModLicenseDisplayString(); break;
-            case 110: config.toggleHideBadges(); string = config.getHideBadgesDisplayString(); break;
-            case 111: config.toggleHideModCredits(); string = config.getHideModCreditsDisplayString(); break;
-            case 112: config.toggleRandomJavaColors(); string = config.getRandomJavaColorsDisplayString(); break;
+            case 102: config.toggleCompactList(); string = config.getCompactListDisplayString(); break;
+            case 103: config.toggleCountChildren(); string = config.getCountChildrenDisplayString(); break;
+            case 104: config.toggleModsButtonStyle(); string = config.getModsButtonStyleDisplayString(); break;
+            case 105: config.toggleGameMenuButtonStyle(); string = config.getGameMenuButtonStyleDisplayString(); break;
+            case 106: config.toggleCountHiddenMods(); string = config.getCountHiddenModsDisplayString(); break;
+            case 107: config.toggleModCountLocation(); string = config.getModCountLocationDisplayString(); break;
+            case 108: config.toggleHideModLinks(); string = config.getHideModLinksDisplayString(); break;
+            case 109: config.toggleShowLibraries(); string = config.getShowLibrariesDisplayString(); break;
+            case 110: config.toggleHideModLicense(); string = config.getHideModLicenseDisplayString(); break;
+            case 111: config.toggleHideBadges(); string = config.getHideBadgesDisplayString(); break;
+            case 112: config.toggleHideModCredits(); string = config.getHideModCreditsDisplayString(); break;
             case 113: config.toggleEasterEggs(); string = config.getEasterEggsDisplayString(); break;
-            case 114: config.toggleTranslateNames(); string = config.getTranslateNamesDisplayString(); break;
-            case 115: config.toggleTranslateDescriptions(); string = config.getTranslateDescriptionsDisplayString(); break;
-            case 116: config.toggleUpdateChecker(); string = config.getUpdateCheckerDisplayString(); break;
-            case 117: config.toggleButtonUpdateBadge(); string = config.getButtonUpdateBadgeDisplayString(); break;
-            case 118: config.toggleQuickConfigure(); string = config.getQuickConfigureDisplayString(); break;
+            case 114: config.toggleRandomJavaColors(); string = config.getRandomJavaColorsDisplayString(); break;
+            case 115: config.toggleTranslateNames(); string = config.getTranslateNamesDisplayString(); break;
+            case 116: config.toggleTranslateDescriptions(); string = config.getTranslateDescriptionsDisplayString(); break;
+            case 117: config.toggleUpdateChecker(); string = config.getUpdateCheckerDisplayString(); break;
+            case 118: config.toggleButtonUpdateBadge(); string = config.getButtonUpdateBadgeDisplayString(); break;
             case 119: config.toggleUpdateChannel(); string = config.getUpdateChannelDisplayString(); break;
+            case 120: config.toggleQuickConfigure(); string = config.getQuickConfigureDisplayString(); break;
             case 200: closeAndReturn(); break;
         }
         if (string != null) button.displayString = string;

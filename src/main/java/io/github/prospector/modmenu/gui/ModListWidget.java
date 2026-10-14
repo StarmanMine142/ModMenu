@@ -170,6 +170,7 @@ public class ModListWidget extends AlwaysSelectedEntryListWidget<ModListEntry> i
 			setScrollAmount(Math.max(0, this.getMaxPosition() - (this.bottom - this.top - 4)));
 		}
 	}
+	
 	@Override
 	protected void renderList(int x, int y, int mouseX, int mouseY, float delta) {
 		int itemCount = this.getItemCount();

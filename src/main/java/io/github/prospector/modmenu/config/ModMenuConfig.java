@@ -11,6 +11,7 @@ import java.util.List;
 public class ModMenuConfig {
 	private Sorting sorting = Sorting.ASCENDING;
 	private boolean countLibraries = true;
+	private boolean compactList = true;
 	private boolean countChildren = true;
 	private ModsButtonStyle modsButtonStyle = ModsButtonStyle.INSERT;
 	private GameMenuButtonStyle gameMenuButtonStyle = GameMenuButtonStyle.INSERT;
@@ -41,6 +42,11 @@ public class ModMenuConfig {
 	public void toggleCountLibraries() {
 		this.countLibraries = !this.countLibraries;
 		ModMenu.invalidateCache();
+		ModMenuConfigManager.save();
+	}
+
+	public void toggleCompactList() {
+		this.compactList = !this.compactList;
 		ModMenuConfigManager.save();
 	}
 
@@ -149,6 +155,10 @@ public class ModMenuConfig {
 		return countLibraries;
 	}
 
+	public boolean getCompactList() {
+		return compactList;
+	}
+
 	public boolean getCountChildren() {
 		return countChildren;
 	}
@@ -239,6 +249,10 @@ public class ModMenuConfig {
 
 	public String getCountLibrariesDisplayString() {
 		return optionString("count_libraries", I18n.getInstance().translateKey("option.modmenu.count_libraries." + this.countLibraries));
+	}
+
+	public String getCompactListDisplayString() {
+		return optionString("compact_list", I18n.getInstance().translateKey("option.modmenu.compact_list." + this.compactList));
 	}
 
 	public String getCountChildrenDisplayString() {

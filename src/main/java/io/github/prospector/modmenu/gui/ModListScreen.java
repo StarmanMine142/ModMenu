@@ -106,7 +106,7 @@ public class ModListScreen extends Screen {
 		String oldText = this.searchBox == null ? "" : this.searchBox.getText();
 		this.searchBox = new TextFieldWidget(searchBoxX, 22, searchBoxWidth, 20, i18n.translateKey("modmenu.search")); // field_6451_g
 		this.searchBox.setText(oldText);
-		this.modList = new ModListWidget(this.mc, paneWidth, this.height, paneY + 19, this.height - 36, 36, this.searchBox.getText(), this.modList, this);
+		this.modList = new ModListWidget(this.mc, paneWidth, this.height, paneY + 19, this.height - 36, config.getCompactList() ? 23 : 36, this.searchBox.getText(), this.modList, this);
 		this.modList.setLeftPos(0);
 		this.descriptionListWidget = new DescriptionListWidget(this.mc, paneWidth, this.height, paneY + 60, this.height - 36, 9 + 1, this);
 		this.descriptionListWidget.setLeftPos(rightPaneX);
@@ -358,7 +358,7 @@ public class ModListScreen extends Screen {
 			}
 
 			this.selected.bindIconTexture();
-			ModListEntry.internalRender(paneY, x);
+			ModListEntry.internalRender(paneY, x, ModListEntry.FULL_ICON_SIZE);
 			int lineSpacing = 9 + 1;
 			int imageOffset = 36;
 			String translationKey = "modmenu.nameTranslation." + id;
