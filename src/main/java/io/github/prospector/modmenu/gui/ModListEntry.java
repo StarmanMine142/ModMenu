@@ -154,10 +154,17 @@ public class ModListEntry extends AlwaysSelectedEntryListWidget.Entry<ModListEnt
 			String prefixedVersion = VersionUtil.getPrefixedVersion(versionString);
 			RenderUtils.INSTANCE.drawWrappedString(this, prefixedVersion, x + iconSize + 3, y + lineHeight + 2, rowWidth - iconSize - 7, 2, 0x808080);
 		} else {
+			String description;
+
 			String descKey = "modmenu.descriptionTranslation." + id;
 			String translatedDesc = i18n.translateKey(descKey);
-			String description;
-			if (!translatedDesc.equals(descKey) && config.getTranslateDescriptions()) {
+
+			String sumKey = "modmenu.summaryTranslation." + id;
+			String translatedSum = i18n.translateKey(sumKey);
+
+			if (!translatedSum.equals(sumKey) && config.getTranslateDescriptions()) {
+				description = translatedSum;
+			} else if (!translatedDesc.equals(descKey) && config.getTranslateDescriptions()) {
 				description = translatedDesc;
 			} else {
 				description = metadata.getDescription();

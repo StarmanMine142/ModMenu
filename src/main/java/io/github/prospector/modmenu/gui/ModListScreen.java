@@ -202,12 +202,12 @@ public class ModListScreen extends Screen {
 	protected void buttonClicked(ButtonElement button) {
 		switch (button.id) {
 			case CONFIGURE_BUTTON_ID: {
-				final String modid = Objects.requireNonNull(selected).getMetadata().getId();
-				final Screen screen = ModMenu.getConfigScreen(modid, this);
+				final String id = Objects.requireNonNull(selected).getMetadata().getId();
+				final Screen screen = ModMenu.getConfigScreen(id, this);
 				if (screen != null) {
 					mc.displayScreen(screen);
 				} else {
-					ModMenu.openConfigScreen(modid);
+					ModMenu.openConfigScreen(id);
 				}
 				break;
 			}

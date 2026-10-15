@@ -31,29 +31,32 @@ public final class ModListSearch {
 
 	private static boolean passesFilters(ModListScreen screen, ModContainer container, String query) {
 		ModMetadata metadata = container.getMetadata();
-		String modId = metadata.getId();
-
-		//Some basic search, could do with something more advanced but this will do for now
+		String id = metadata.getId();
 		I18n i18n = I18n.getInstance();
 		ModMenuConfig config = ModMenuConfigManager.getConfig();
 
-		String nameTranslation = "modmenu.nameTranslation." + modId;
+		String nameTranslation = "modmenu.nameTranslation." + id;
 		String translatedName = i18n.translateKey(nameTranslation);
 		String modName = !translatedName.equals(nameTranslation) && config.getTranslateNames() ? translatedName : metadata.getName();
 
-		String descriptionTranslation = "modmenu.descriptionTranslation." + modId;
+		String descriptionTranslation = "modmenu.descriptionTranslation." + id;
 		String translatedDescription = i18n.translateKey(descriptionTranslation);
 		String modDescription = !translatedDescription.equals(descriptionTranslation) && config.getTranslateDescriptions() ? translatedDescription : metadata.getDescription();
 
+		String summaryTranslation = "modmenu.summaryTranslation." + id;
+		String translatedSummary = i18n.translateKey(summaryTranslation);
+		String modSummary = !translatedSummary.equals(summaryTranslation) && config.getTranslateDescriptions() ? translatedSummary : metadata.getDescription();
+
 		if (modName.toLowerCase(Locale.ROOT).contains(query) // Search mod name
 				|| modDescription.toLowerCase(Locale.ROOT).contains(query) // Search mod description
-				|| modId.toLowerCase(Locale.ROOT).contains(query) // Search mod id
+				|| modSummary.toLowerCase(Locale.ROOT).contains(query) // Search mod summary
+				|| id.toLowerCase(Locale.ROOT).contains(query) // Search mod id
 				|| authorMatches(container, query) // Search via author
-				|| (ModMenu.LIBRARY_MODS.contains(modId) && i18n.translateKey("modmenu.searchTerms.library").toLowerCase(Locale.ROOT).contains(query)) // Search for lib mods
-				|| (ModMenu.CLIENTSIDE_MODS.contains(modId) && i18n.translateKey("modmenu.searchTerms.clientside").toLowerCase(Locale.ROOT).contains(query)) // Search for clientside mods
-				|| (ModMenu.DEPRECATED_MODS.contains(modId) && i18n.translateKey("modmenu.searchTerms.deprecated").toLowerCase(Locale.ROOT).contains(query)) // Search for deprecated mods
-				|| (ModMenu.PATCHWORK_FORGE_MODS.contains(modId) && i18n.translateKey("modmenu.searchTerms.patchwork").toLowerCase(Locale.ROOT).contains(query)) // Search for forge and patchwork
-				|| (ModMenu.hasConfigScreenFactory(modId) && i18n.translateKey("modmenu.searchTerms.configurable").toLowerCase(Locale.ROOT).contains(query)) // Search for mods that can be configured
+				|| (ModMenu.LIBRARY_MODS.contains(id) && i18n.translateKey("modmenu.searchTerms.library").toLowerCase(Locale.ROOT).contains(query)) // Search for lib mods
+				|| (ModMenu.CLIENTSIDE_MODS.contains(id) && i18n.translateKey("modmenu.searchTerms.clientside").toLowerCase(Locale.ROOT).contains(query)) // Search for clientside mods
+				|| (ModMenu.DEPRECATED_MODS.contains(id) && i18n.translateKey("modmenu.searchTerms.deprecated").toLowerCase(Locale.ROOT).contains(query)) // Search for deprecated mods
+				|| (ModMenu.PATCHWORK_FORGE_MODS.contains(id) && i18n.translateKey("modmenu.searchTerms.patchwork").toLowerCase(Locale.ROOT).contains(query)) // Search for forge and patchwork
+				|| (ModMenu.hasConfigScreenFactory(id) && i18n.translateKey("modmenu.searchTerms.configurable").toLowerCase(Locale.ROOT).contains(query)) // Search for mods that can be configured
 		) {
 			return true;
 		}
