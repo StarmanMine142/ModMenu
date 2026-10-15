@@ -4,6 +4,7 @@ import io.github.prospector.modmenu.gui.ModListEntry;
 import io.github.prospector.modmenu.gui.ModListWidget;
 import net.fabricmc.loader.api.ModContainer;
 import net.minecraft.client.Minecraft;
+import org.lwjgl.input.Keyboard;
 
 public class ChildEntry extends ModListEntry {
 	private boolean bottomChild;
@@ -18,10 +19,20 @@ public class ChildEntry extends ModListEntry {
 	@Override
 	public void render(int index, int y, int x, int rowWidth, int rowHeight, int mouseX, int mouseY, boolean isSelected, float delta) {
 		super.render(index, y, x, rowWidth, rowHeight, mouseX, mouseY, isSelected, delta);
-		x += 4;
+		x -= 2;
 		int color = 0xFFA0A0A0;
-        drawRect(x, y - 2, x + 1, y + (bottomChild ? rowHeight / 2 : rowHeight + 2), color);
-        drawRect(x, y + rowHeight / 2, x + 7, y + rowHeight / 2 + 1, color);
+		drawRect(x, y - 2, x + 1, y + (bottomChild ? rowHeight / 2 : rowHeight + 2), color);
+		drawRect(x, y + rowHeight / 2, x + 7, y + rowHeight / 2 + 1, color);
+	}
+
+	@Override
+	public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+		if (keyCode == Keyboard.KEY_LEFT) {
+			list.select(parent);
+			list.ensureVisible(parent);
+			return true;
+		}
+		return super.keyPressed(keyCode, scanCode, modifiers);
 	}
 
 	@Override

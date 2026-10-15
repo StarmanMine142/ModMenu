@@ -49,6 +49,11 @@ public class ParentEntry extends ModListEntry {
 		int iconSize = config.getCompactList() ? COMPACT_ICON_SIZE : FULL_ICON_SIZE;
 		int childrenBadgeX = x + iconSize - childrenBadgeWidth;
 		int childrenBadgeY = y + iconSize - childrenBadgeHeight;
+
+		GLRenderer.pushFrame();
+		GLRenderer.setShader(Shaders.INTERFACE);
+		GLRenderer.setColor4f(1, 1, 1, 1);
+
 		int childrenOutlineColor = 0xff107454;
 		int childrenFillColor = 0xff093929;
 		drawRect(childrenBadgeX + 1, childrenBadgeY, childrenBadgeX + childrenBadgeWidth - 1, childrenBadgeY + 1, childrenOutlineColor);
@@ -56,7 +61,9 @@ public class ParentEntry extends ModListEntry {
 		drawRect(childrenBadgeX + childrenBadgeWidth - 1, childrenBadgeY + 1, childrenBadgeX + childrenBadgeWidth, childrenBadgeY + childrenBadgeHeight - 1, childrenOutlineColor);
 		drawRect(childrenBadgeX + 1, childrenBadgeY + 1, childrenBadgeX + childrenBadgeWidth - 1, childrenBadgeY + childrenBadgeHeight - 1, childrenFillColor);
 		drawRect(childrenBadgeX + 1, childrenBadgeY + childrenBadgeHeight - 1, childrenBadgeX + childrenBadgeWidth - 1, childrenBadgeY + childrenBadgeHeight, childrenOutlineColor);
-		this.drawStringNoShadow(font, childrenStr, childrenBadgeX + childrenBadgeWidth / 2 - childrenWidth / 2, childrenBadgeY + 1, 0xCACACA);
+		this.drawStringNoShadow(font, childrenStr, childrenBadgeX + childrenBadgeWidth / 2 - childrenWidth / 2, childrenBadgeY + 1, 0xFFCACACA);
+
+		GLRenderer.popFrame();
 
 		this.hoveringIcon = mouseX >= x - 1 && mouseX <= x - 1 + iconSize && mouseY >= y - 1 && mouseY <= y - 1 + iconSize;
 		if (isMouseOver(mouseX, mouseY)) {
@@ -86,7 +93,8 @@ public class ParentEntry extends ModListEntry {
 	@Override
 	public void mouseClicked(int mouseX, int mouseY, int i) {
 		int iconSize = config.getCompactList() ? COMPACT_ICON_SIZE : FULL_ICON_SIZE;
-		if (mouseX >= 0 && mouseX <= iconSize) {
+		int iconLeft = list.getRowLeft() + getXOffset();
+		if (mouseX >= iconLeft && mouseX < iconLeft + iconSize) {
 			toggleChildren();
 			return;
 		} else if (!config.getQuickConfigure() && System.currentTimeMillis() - sinceLastClick < 250) {

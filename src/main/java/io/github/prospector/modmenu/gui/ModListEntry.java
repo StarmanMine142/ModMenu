@@ -243,12 +243,12 @@ public class ModListEntry extends AlwaysSelectedEntryListWidget.Entry<ModListEnt
 	public void mouseClicked(int v, int v1, int i) {
 		list.select(this);
 
-		if (i == 0 && !(this instanceof ParentEntry)) {
+		if (i == 0 && !(this instanceof ParentEntry) && config.getQuickConfigure()) {
 			String id = metadata.getId();
-			if (ModMenu.hasConfigScreenFactory(id) || ModMenu.hasLegacyConfigScreenTask(id) && config.getQuickConfigure()) {
+			if (ModMenu.hasConfigScreenFactory(id) || ModMenu.hasLegacyConfigScreenTask(id)) {
 				int iconSize = config.getCompactList() ? COMPACT_ICON_SIZE : FULL_ICON_SIZE;
-				int iconLeft = getXOffset();
-				if (v >= iconLeft && v < iconLeft + iconSize && v1 >= 0 && v1 < iconSize) {
+				int iconLeft = list.getRowLeft() + getXOffset();
+				if (v >= iconLeft && v < iconLeft + iconSize) {
 					final Screen screen = ModMenu.getConfigScreen(id, list.getParent());
 					if (screen != null) {
 						client.displayScreen(screen);

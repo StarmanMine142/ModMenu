@@ -31,6 +31,10 @@ public class ModListWidget extends AlwaysSelectedEntryListWidget<ModListEntry> i
 	private Set<ModContainer> addedMods = new HashSet<>();
 	private String selectedModId = null;
 
+	private boolean scrollBarDragging = false;
+	private double scrollBarGrabbedY = 0;
+	private double scrollBarGrabOffset = 0;
+
 	ModMenuConfig config = ModMenuConfigManager.getConfig();
 
 	public ModListWidget(Minecraft client, int width, int height, int y1, int y2, int entryHeight, String searchTerm, ModListWidget list, ModListScreen parent) {
@@ -100,9 +104,42 @@ public class ModListWidget extends AlwaysSelectedEntryListWidget<ModListEntry> i
 		filter(parent.getSearchInput(), true, false);
 	}
 
-
 	public void filter(String searchTerm, boolean refresh) {
 		filter(searchTerm, refresh, true);
+	}
+
+	private List<ModContainer> getChildrenFor(String parentId) {
+		for (Map.Entry<ModContainer, List<ModContainer>> e : ModMenu.PARENT_MAP.entrySet()) {
+			if (e.getKey().getMetadata().getId().equals(parentId)) {
+				return e.getValue();
+			}
+		}
+		return null;
+	}
+
+	private boolean isParent(String modId) {
+		for (ModContainer c : ModMenu.PARENT_MAP.keySet()) {
+			if (c.getMetadata().getId().equals(modId)) return true;
+		}
+		return false;
+	}
+
+	private boolean isChild(String modId) {
+		for (List<ModContainer> list : ModMenu.PARENT_MAP.values()) {
+			for (ModContainer c : list) {
+				if (c.getMetadata().getId().equals(modId)) return true;
+			}
+		}
+		return false;
+	}
+
+	private boolean hasVisibleChildMods(ModContainer parent) {
+		List<ModContainer> children = getChildrenFor(parent.getMetadata().getId());
+		if (children == null) return false;
+		return !children.stream().allMatch(child -> {
+			String childId = child.getMetadata().getId();
+			return ModMenu.LIBRARY_MODS.contains(childId) && !config.getShowLibraries();
+		});
 	}
 
 	private void filter(String searchTerm, boolean refresh, boolean search) {
@@ -125,25 +162,29 @@ public class ModListWidget extends AlwaysSelectedEntryListWidget<ModListEntry> i
 
 		for (ModContainer container : matched) {
 			ModMetadata metadata = container.getMetadata();
-			String modId = metadata.getId();
-			boolean library = ModMenu.LIBRARY_MODS.contains(modId);
+			String id = metadata.getId();
+			boolean library = ModMenu.LIBRARY_MODS.contains(id);
 
 			//Hide parent lib mods when the config is set to hide
 			if (library && !config.getShowLibraries()) {
 				continue;
 			}
 
-			if (!ModMenu.PARENT_MAP.values().contains(container)) {
-				if (ModMenu.PARENT_MAP.keySet().contains(container)) {
+			if (!isChild(id)) {
+				if (isParent(id) && hasVisibleChildMods(container)) {
 					//Add parent mods when not searching
-					List<ModContainer> children = ModMenu.PARENT_MAP.get(container);
+					List<ModContainer> children = getChildrenFor(id);
 					children.sort(config.getSorting().getComparator());
 					ParentEntry parent = new ParentEntry(minecraft, container, children, this);
 					this.addEntry(parent);
 					//Add children if they are meant to be shown
-					if (this.parent.showModChildren.contains(modId)) {
+					if (this.parent.showModChildren.contains(id)) {
 						List<ModContainer> validChildren = ModListSearch.search(this.parent, searchTerm, children);
 						for (ModContainer child : validChildren) {
+							String childId = child.getMetadata().getId();
+							if (ModMenu.LIBRARY_MODS.contains(childId) && !config.getShowLibraries()) {
+								continue;
+							}
 							this.addEntry(new ChildEntry(minecraft, child, parent, this, validChildren.indexOf(child) == validChildren.size() - 1));
 						}
 					}
@@ -170,7 +211,7 @@ public class ModListWidget extends AlwaysSelectedEntryListWidget<ModListEntry> i
 			setScrollAmount(Math.max(0, this.getMaxPosition() - (this.bottom - this.top - 4)));
 		}
 	}
-	
+
 	@Override
 	protected void renderList(int x, int y, int mouseX, int mouseY, float delta) {
 		int itemCount = this.getItemCount();
@@ -217,60 +258,111 @@ public class ModListWidget extends AlwaysSelectedEntryListWidget<ModListEntry> i
 		}
 
 		GLRenderer.popFrame();
-
 	}
 
 	@Override
-	public void mouseClicked(int double_1, int double_2, int int_1) {
-		this.updateScrollingState(double_1, double_2, int_1);
-		if (this.isMouseOver(double_1, double_2))  {
-			ModListEntry entry = this.getEntryAtPos(double_1, double_2);
+	public void mouseClicked(int mouseX, int mouseY, int mouseButton) {
+		this.updateScrollingState(mouseX, mouseY, mouseButton);
+		if (this.isMouseOver(mouseX, mouseY)) {
+			ModListEntry entry = this.getEntryAtPos(mouseX, mouseY);
 			if (entry != null) {
-				if (int_1 == 0 && !(entry instanceof ParentEntry) && config.getQuickConfigure()) {
-					String id = entry.getMetadata().getId();
-					if (ModMenu.hasConfigScreenFactory(id) || ModMenu.hasLegacyConfigScreenTask(id)) {
-						int iconLeft = getRowLeft() + entry.getXOffset();
-						if (double_1 >= iconLeft && double_1 < iconLeft + 32) {
-							int index = children().indexOf(entry);
-							if (index >= 0) {
-								int entryTop = this.getRowTop(index) + 2;
-								if (double_2 >= entryTop && double_2 < entryTop + 32) {
-									final Screen screen = ModMenu.getConfigScreen(id, parent);
-									if (screen != null) {
-										minecraft.displayScreen(screen);
-									} else {
-										ModMenu.openConfigScreen(id);
-									}
-									return;
-								}
-							}
-						}
-					}
-				}
-
-				if (entry.list.getFocused() != null) {
-					if (!entry.list.getFocused().equals(entry)) {
-						this.setFocused(entry);
-						this.setSelected(entry);
-						this.setDragging(true);
-						super.mouseClicked(double_1, double_2, int_1);
-					}
-				} else {
+				if (entry.list.getFocused() == null || !entry.list.getFocused().equals(entry)) {
 					this.setFocused(entry);
 					this.setSelected(entry);
 					this.setDragging(true);
-					super.mouseClicked(double_1, double_2, int_1);
 				}
-			} else if (int_1 == 0) {
-				this.clickedHeader((int) (double_1 - (double) (this.left + this.width / 2 - this.getRowWidth() / 2)), (int) (double_2 - (double) this.top) + (int) this.getScrollAmount() - 4);
+				entry.mouseClicked(mouseX, mouseY, mouseButton);
+			} else if (mouseButton == 0) {
+				this.clickedHeader(
+						(int) (mouseX - (double) (this.left + this.width / 2 - this.getRowWidth() / 2)),
+						(int) (mouseY - (double) this.top) + (int) this.getScrollAmount() - 4
+				);
 			}
 		}
+	}
+
+	protected void updateScrollingState(double mouseX, double mouseY, int mouseButton) {
+		this.scrollBarDragging = false;
+		if (mouseButton == 0
+				&& mouseX >= (double) this.getScrollbarPosition()
+				&& mouseX < (double) (this.getScrollbarPosition() + 6)) {
+			this.scrollBarDragging = true;
+			this.scrollBarGrabbedY = mouseY;
+			if (this.getMaxPosition() > 0) {
+				int trackHeight = this.bottom - this.top - 4;
+				int thumbHeight = Math.max(32, trackHeight * trackHeight / this.getMaxPosition());
+				int thumbTop = (int) this.getScrollAmount() * (trackHeight - thumbHeight) / this.getMaxScroll() + this.top;
+				if (thumbTop < this.top) {
+					thumbTop = this.top;
+				}
+				if (thumbTop + thumbHeight > this.bottom) {
+					thumbTop = this.bottom - thumbHeight;
+				}
+				this.scrollBarGrabOffset = thumbTop - mouseY;
+			} else {
+				this.scrollBarGrabOffset = 0;
+			}
+		}
+	}
+
+	protected void clickedHeader(int x, int y) {
+	}
+
+	@Override
+	public void mouseDragged(double mouseX, double mouseY, int mouseButton, double deltaX, double deltaY) {
+		if (this.scrollBarDragging && mouseButton == 0) {
+			int trackHeight = this.bottom - this.top - 4;
+			if (this.getMaxPosition() > 0 && trackHeight > 0) {
+				int thumbHeight = Math.max(32, trackHeight * trackHeight / this.getMaxPosition());
+				double thumbTop = mouseY + this.scrollBarGrabOffset - this.top;
+				double scrollable = trackHeight - thumbHeight;
+				if (scrollable > 0) {
+					double amount = thumbTop / scrollable * this.getMaxScroll();
+					this.setScrollAmount(amount);
+				}
+			}
+		} else {
+			super.mouseDragged(mouseX, mouseY, mouseButton, deltaX, deltaY);
+		}
+	}
+
+	@Override
+	public void mouseReleased(int mouseX, int mouseY, int mouseButton) {
+		this.scrollBarDragging = false;
+		super.mouseReleased(mouseX, mouseY, mouseButton);
 	}
 
 	@Override
 	public void mouseScrolled(double mouseX, double mouseY, double scrollDelta) {
 		if (this.isMouseOver(mouseX, mouseY)) {
 			setScrollAmount(getScrollAmount() - scrollDelta * 20.0);
+		}
+	}
+
+	public void ensureVisible(ModListEntry entry) {
+		int index = this.children().indexOf(entry);
+		if (index < 0) return;
+		int i = this.getRowTop(index);
+		int j = i - this.top - 4 - this.itemHeight;
+		if (j < 0) {
+			this.setScrollAmount(this.getScrollAmount() + j);
+		}
+
+		int k = this.bottom - i - (this.itemHeight * 2);
+		if (k < 0) {
+			this.setScrollAmount(this.getScrollAmount() - k);
+		}
+	}
+
+	public void keyPressed(int keyCode, int scanCode, int modifiers) {
+		if (keyCode == 264 || keyCode == 265) {
+			super.keyPressed(keyCode, scanCode, modifiers);
+			return;
+		}
+
+		ModListEntry selected = getSelected();
+		if (selected != null) {
+			selected.keyPressed(keyCode, scanCode, modifiers);
 		}
 	}
 
@@ -291,7 +383,7 @@ public class ModListWidget extends AlwaysSelectedEntryListWidget<ModListEntry> i
 	}
 
 	@Override
-	protected int getRowLeft() {
+	public int getRowLeft() {
 		return left + 6;
 	}
 
