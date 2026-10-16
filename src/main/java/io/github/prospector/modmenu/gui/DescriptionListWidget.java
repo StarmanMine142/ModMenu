@@ -239,16 +239,34 @@ public class DescriptionListWidget extends EntryListWidget<DescriptionListWidget
 				children().add(new DescriptionEntry(i18n.translateKey("modmenu.credits")));
 
 				if (!authors.isEmpty()) {
-					children().add(new DescriptionEntry("  " + i18n.translateKey("modmenu.authors")));
+					int indent = 8;
+					for (String line : RenderUtils.INSTANCE.wrapStringToWidthAsList(textRenderer, creditsRoleText("Author"), getRowWidth() - 16)) {
+						children().add(new DescriptionEntry(line, indent));
+						indent = 16;
+					}
 					for (Person person : authors) {
-						children().add(new DescriptionEntry("    " + person.getName()));
+						indent = 16;
+						for (String line : RenderUtils.INSTANCE.wrapStringToWidthAsList(textRenderer, person.getName(), getRowWidth() - 24)) {
+							children().add(new DescriptionEntry(line, indent));
+							indent = 24;
+						}
 					}
 				}
 
 				if (!contributors.isEmpty()) {
-					children().add(new DescriptionEntry("  " + i18n.translateKey("modmenu.contributors")));
+					if (!authors.isEmpty()) children().add(new DescriptionEntry(""));
+
+					int indent = 8;
+					for (String line : RenderUtils.INSTANCE.wrapStringToWidthAsList(textRenderer, creditsRoleText("Contributor"), getRowWidth() - 16)) {
+						children().add(new DescriptionEntry(line, indent));
+						indent = 16;
+					}
 					for (Person person : contributors) {
-						children().add(new DescriptionEntry("    " + person.getName()));
+						indent = 16;
+						for (String line : RenderUtils.INSTANCE.wrapStringToWidthAsList(textRenderer, person.getName(), getRowWidth() - 24)) {
+							children().add(new DescriptionEntry(line, indent));
+							indent = 24;
+						}
 					}
 				}
 			}
@@ -270,6 +288,13 @@ public class DescriptionListWidget extends EntryListWidget<DescriptionListWidget
 	protected void renderHoleBackground(int y1, int y2, int startAlpha, int endAlpha) {
 		// Awful hack but it makes the background "seamless"
 		parent.overlayBackground(left, y1, right, y2, 64, 64, 64, startAlpha, endAlpha);
+	}
+
+	private String creditsRoleText(String roleName) {
+		String translationKey = "modmenu.credits.role." + roleName.replaceAll("[ -]", "_").toLowerCase();
+		String fallback = roleName.endsWith("r") ? roleName + "s" : roleName;
+		String translated = I18n.getInstance().translateKey(translationKey);
+		return (translated.equals(translationKey) ? fallback : translated) + ":";
 	}
 
 	protected static class DescriptionEntry extends Entry<DescriptionEntry> {

@@ -55,6 +55,7 @@ modmenu.install_version=Install version %s
 modmenu.downloadLink=Download
 
 modmenu.bluesky=Bluesky
+modmenu.bta=Downloads BTA!
 modmenu.buymeacoffee=Buy Me a Coffee
 modmenu.coindrop=Coindrop
 modmenu.crowdin=Crowdin
@@ -77,8 +78,13 @@ modmenu.wiki=Wiki
 modmenu.twitter=X (Twitter)
 modmenu.youtube=YouTube
 
-modmenu.authors=Authors:
-modmenu.contributors=Contributors:
+modmenu.credits.role.author=Authors
+modmenu.credits.role.contributor=Contributors
+modmenu.credits.role.translator=Translators
+modmenu.credits.role.maintainer=Maintainers
+modmenu.credits.role.playtester=Playtesters
+modmenu.credits.role.illustrator=Illustrators
+modmenu.credits.role.owner=Owners
 
 modmenu.modsFolder=Open Mods Folder
 modmenu.configsFolder=Open Configs Folder

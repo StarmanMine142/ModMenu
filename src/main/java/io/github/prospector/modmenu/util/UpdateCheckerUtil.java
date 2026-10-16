@@ -4,11 +4,8 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.annotations.SerializedName;
 import io.github.prospector.modmenu.ModMenu;
-import io.github.prospector.modmenu.api.UpdateChannel;
-import io.github.prospector.modmenu.api.UpdateChecker;
-import io.github.prospector.modmenu.api.UpdateInfo;
-import io.github.prospector.modmenu.util.mod.Mod;
-import io.github.prospector.modmenu.util.mod.ModrinthUpdateInfo;
+import io.github.prospector.modmenu.api.*;
+import io.github.prospector.modmenu.util.mod.*;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,15 +17,14 @@ import java.net.http.HttpResponse;
 import java.time.Instant;
 import java.time.format.DateTimeParseException;
 import java.util.*;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
+import java.util.concurrent.*;
 
 public class UpdateCheckerUtil {
     public static final Logger LOGGER = LoggerFactory.getLogger("Mod Menu/Update Checker");
 
     private static boolean modrinthApiV2Removed = false;
+
+    private static final String BTA_VERSIONS_URL = "https://downloads.betterthanadventure.net/bta-client/release/versions.json";
 
     private static boolean allowsUpdateChecks(Mod mod) {
         return mod.allowsUpdateChecks();
@@ -40,6 +36,8 @@ public class UpdateCheckerUtil {
     }
 
     private static void checkForUpdates0() {
+        checkBtaUpdate();
+
         List<Mod> withoutUpdateChecker = new ArrayList<>();
         Map<String, Instant> currentVersions = null;
         Map<String, VersionUpdate> updatedVersions = null;
@@ -125,6 +123,93 @@ public class UpdateCheckerUtil {
                 );
             }
         }
+    }
+
+    private static void checkBtaUpdate() {
+        Mod btaMod = ModMenu.MODS.get("minecraft");
+        if (btaMod == null) {
+            LOGGER.debug("BTA mod not found in MODS map, skipping BTA update check");
+            return;
+        }
+
+        if (!allowsUpdateChecks(btaMod)) {
+            LOGGER.debug("Update checks disabled for BTA, skipping");
+            return;
+        }
+
+        String currentVersion = btaMod.getVersion();
+        LOGGER.debug("Current BTA version: {}", currentVersion);
+
+        try {
+            HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
+                    .GET()
+                    .uri(URI.create(BTA_VERSIONS_URL));
+
+            HttpResponse<String> response = HttpUtil.request(requestBuilder, HttpResponse.BodyHandlers.ofString());
+
+            if (response.statusCode() != 200) {
+                LOGGER.debug("BTA update check: HTTP {}", response.statusCode());
+                return;
+            }
+
+            JsonObject json = JsonParser.parseString(response.body()).getAsJsonObject();
+            if (!json.has("default")) {
+                LOGGER.debug("BTA update check: versions.json has no 'default' field");
+                return;
+            }
+
+            String latestVersion = json.get("default").getAsString();
+            if (latestVersion.startsWith("v")) {
+                latestVersion = latestVersion.substring(1);
+            }
+
+            LOGGER.debug("Latest BTA version from versions.json: {}", latestVersion);
+
+            if (isNewer(latestVersion, currentVersion)) {
+                btaMod.setUpdateInfo(new BTAUpdateInfo(
+                        latestVersion,
+                        latestVersion,
+                        latestVersion,
+                        UpdateChannel.RELEASE
+                ));
+                LOGGER.info("Update available for BTA: {} -> {}", currentVersion, latestVersion);
+            } else {
+                LOGGER.debug("BTA is up to date ({} >= {})", currentVersion, latestVersion);
+            }
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            LOGGER.error("Error checking BTA update: ", e);
+        } catch (IOException | RuntimeException e) {
+            LOGGER.error("Error checking BTA update: ", e);
+        }
+    }
+
+    private static boolean isNewer(String latest, String current) {
+        int[] a = parseVersion(latest);
+        int[] b = parseVersion(current);
+        int len = Math.max(a.length, b.length);
+        for (int i = 0; i < len; i++) {
+            int ai = i < a.length ? a[i] : 0;
+            int bi = i < b.length ? b[i] : 0;
+            if (ai != bi) {
+                return ai > bi;
+            }
+        }
+        return false;
+    }
+
+    private static int[] parseVersion(String version) {
+        String cleaned = version.replaceAll("[^0-9._]", "");
+        String[] parts = cleaned.split("[._]");
+        int[] result = new int[parts.length];
+        for (int i = 0; i < parts.length; i++) {
+            try {
+                result[i] = Integer.parseInt(parts[i]);
+            } catch (NumberFormatException e) {
+                result[i] = 0;
+            }
+        }
+        return result;
     }
 
     private static Map<String, Set<Mod>> getModHashes(Collection<Mod> mods) {

@@ -55,6 +55,7 @@ modmenu.install_version=Установити версію %s
 modmenu.downloadLink=Завантажити
 
 modmenu.bluesky=Bluesky
+modmenu.bta=Завантаження BTA!
 modmenu.buymeacoffee=Buy Me a Coffee
 modmenu.coindrop=Coindrop
 modmenu.crowdin=Crowdin
@@ -77,8 +78,13 @@ modmenu.wiki=Вікі
 modmenu.twitter=Х (Twitter)
 modmenu.youtube=YouTube
 
-modmenu.authors=Автори:
-modmenu.contributors=Дописувачі:
+modmenu.credits.role.author=Автори
+modmenu.credits.role.contributor=Дописувачі
+modmenu.credits.role.translator=Перекладачі
+modmenu.credits.role.maintainer=Супроводжувачі
+modmenu.credits.role.playtester=Тестери
+modmenu.credits.role.illustrator=Ілюстратори
+modmenu.credits.role.owner=Власники
 
 modmenu.modsFolder=Відкрити теку модів
 modmenu.configsFolder=Відкрити теку налаштувань
