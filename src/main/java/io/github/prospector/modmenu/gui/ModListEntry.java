@@ -177,7 +177,24 @@ public class ModListEntry extends AlwaysSelectedEntryListWidget.Entry<ModListEnt
 			}
 
 			if (description != null) {
-				RenderUtils.INSTANCE.drawWrappedString(this, description, x + iconSize + 3 + 4, y + lineHeight + 2, rowWidth - iconSize - 7, 2, 0x808080);
+				int textX = x + iconSize + 3 + 4;
+				int textY = y + lineHeight + 2;
+				int maxWidth = rowWidth - iconSize - 7;
+				int maxLines = 2;
+				int currentLine = 0;
+
+				String[] paragraphs = description.split("\r?\n");
+
+				for (String paragraph : paragraphs) {
+					if (currentLine >= maxLines) break;
+
+					for (String line : RenderUtils.INSTANCE.wrapStringToWidthAsList(font, paragraph, maxWidth)) {
+						if (currentLine >= maxLines) break;
+
+						this.drawStringNoShadow(font, line, textX, textY + (currentLine * lineHeight), 0x808080);
+						currentLine++;
+					}
+				}
 			}
 		}
 
