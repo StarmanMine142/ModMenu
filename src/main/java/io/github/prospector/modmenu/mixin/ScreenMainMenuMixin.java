@@ -2,10 +2,9 @@ package io.github.prospector.modmenu.mixin;
 
 import io.github.prospector.modmenu.ModMenu;
 import io.github.prospector.modmenu.config.ModMenuConfig;
-import io.github.prospector.modmenu.config.ModMenuConfigManager;
-import io.github.prospector.modmenu.gui.ModListScreen;
-import io.github.prospector.modmenu.gui.ModMenuButtonWidget;
-import io.github.prospector.modmenu.gui.ModMenuTexturedButtonWidget;
+import io.github.prospector.modmenu.gui.ModsScreen;
+import io.github.prospector.modmenu.gui.widget.ModMenuButtonWidget;
+import io.github.prospector.modmenu.gui.widget.SmallModMenuButtonWidget;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ButtonElement;
 import net.minecraft.client.gui.ScreenMainMenu;
@@ -27,11 +26,10 @@ public class ScreenMainMenuMixin {
 	public void modmenu$drawMenuButton(CallbackInfo info) {
 		ScreenMainMenu menu = (ScreenMainMenu) (Object) this;
 		ButtonElement texturePackButton = menu.buttons.get(2);
-		ModMenuConfig config = ModMenuConfigManager.getConfig();
-		if (config.getEasterEggs()) {
+		if (ModMenuConfig.EASTER_EGGS.getValue()) {
 			texturePackButton.displayString = new Random().nextInt(1000) == 0 ? "Twin Peaks" : i18n.translateKey("gui.main_menu.button.asset_packs");
 		}
-		if (config.getModsButtonStyle() == ModMenuConfig.ModsButtonStyle.INSERT) {
+		if (ModMenuConfig.MODS_BUTTON_STYLE.getValue() == ModMenuConfig.TitleMenuButtonStyle.INSERT) {
 			int index = menu.buttons.indexOf(texturePackButton);
 			if (index != -1) {
 				String buttonText = ModMenu.createModsButtonText(true);
@@ -41,7 +39,7 @@ public class ScreenMainMenuMixin {
 			}
 		} else {
 			menu.buttons.removeIf(b -> b.id == 11);
-			menu.buttons.add(new ModMenuTexturedButtonWidget(
+			menu.buttons.add(new SmallModMenuButtonWidget(
 					1000, menu.width / 2 - 124, menu.height / 4 + 132, 20, 20, 0, 0,
 					"/assets/" + ModMenu.MOD_ID + "/textures/gui/open_button.png", 32, 64
 			) {});
@@ -51,21 +49,20 @@ public class ScreenMainMenuMixin {
 	@Inject(method = "buttonClicked", at = @At("HEAD"))
 	private void modmenu$onActionPerformed(ButtonElement button, CallbackInfo ci) {
 		if (button.id == 1000) {
-			Minecraft.getMinecraft().displayScreen(new ModListScreen((ScreenMainMenu) (Object) this));
+			Minecraft.getMinecraft().displayScreen(new ModsScreen((ScreenMainMenu) (Object) this));
 		}
 	}
 
 	@Inject(method = "render", at = @At("RETURN"))
 	private void modmenu$renderModCount(int mx, int my, float partialTick, CallbackInfo ci) {
-		ModMenuConfig config = ModMenuConfigManager.getConfig();
-		if (config.getModCountLocation().isOnTitleScreen()) {
+		if (ModMenuConfig.MOD_COUNT_LOCATION.getValue().isOnTitleScreen()) {
 			ScreenMainMenu menu = (ScreenMainMenu) (Object) this;
 			String count = ModMenu.getDisplayedModCount();
 			String specificKey = "modmenu.mods." + count;
 			String nKey = i18n.translateKey(specificKey);
 			String key = !nKey.equals(specificKey) ? specificKey : "modmenu.mods.n";
 			String secretKey = specificKey + ".secret";
-			if (config.getEasterEggs() && !i18n.translateKey(secretKey).equals(secretKey)) {
+			if (ModMenuConfig.EASTER_EGGS.getValue() && !i18n.translateKey(secretKey).equals(secretKey)) {
 				key = secretKey;
 			}
 			String versionText = "Better than Adventure! " + Minecraft.VERSION;

@@ -1,9 +1,11 @@
-package io.github.prospector.modmenu.gui;
+package io.github.prospector.modmenu.gui.widget;
 
 import io.github.prospector.modmenu.ModMenu;
 import io.github.prospector.modmenu.api.UpdateInfo;
 import io.github.prospector.modmenu.config.ModMenuConfig;
-import io.github.prospector.modmenu.config.ModMenuConfigManager;
+import io.github.prospector.modmenu.gui.ModsScreen;
+import io.github.prospector.modmenu.gui.widget.entries.EntryListWidget;
+import io.github.prospector.modmenu.gui.widget.entries.ModListEntry;
 import io.github.prospector.modmenu.util.RenderUtils;
 import io.github.prospector.modmenu.util.mod.Mod;
 import net.fabricmc.loader.api.metadata.ContactInformation;
@@ -20,13 +22,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class DescriptionListWidget extends EntryListWidget<DescriptionListWidget.DescriptionEntry> {
-	private final ModListScreen parent;
+	private final ModsScreen parent;
 	private final FontRenderer textRenderer;
 	private ModListEntry lastSelected = null;
 
-	ModMenuConfig config = ModMenuConfigManager.getConfig();
-
-	public DescriptionListWidget(Minecraft client, int width, int height, int top, int bottom, int entryHeight, ModListScreen parent) {
+	public DescriptionListWidget(Minecraft client, int width, int height, int top, int bottom, int entryHeight, ModsScreen parent) {
 		super(client, width, height, top, bottom, entryHeight);
 		this.parent = parent;
 		this.textRenderer = client.font;
@@ -120,7 +120,7 @@ public class DescriptionListWidget extends EntryListWidget<DescriptionListWidget
 			String translatedDesc = i18n.translateKey(descKey);
 
 			String description;
-			if (!translatedDesc.equals(descKey) && config.getTranslateDescriptions()) {
+			if (!translatedDesc.equals(descKey) && ModMenuConfig.TRANSLATE_DESCRIPTIONS.getValue()) {
 				description = translatedDesc;
 			} else {
 				description = selectedEntry.getMetadata().getDescription();
@@ -155,7 +155,7 @@ public class DescriptionListWidget extends EntryListWidget<DescriptionListWidget
 			links.remove("homepage");
 			links.remove("issues");
 
-			if (config.getUpdateChecker()) {
+			if (ModMenuConfig.UPDATE_CHECKER.getValue()) {
 				Mod mod = ModMenu.MODS.get(id);
 				if (mod != null) {
 					UpdateInfo updateInfo = mod.getUpdateInfo();
@@ -194,7 +194,7 @@ public class DescriptionListWidget extends EntryListWidget<DescriptionListWidget
 				}
 			}
 
-			if (!links.isEmpty() && !config.getHideModLinks()) {
+			if (!links.isEmpty() && !ModMenuConfig.HIDE_MOD_LINKS.getValue()) {
 				children().add(new DescriptionEntry(""));
 
 				for (String line : RenderUtils.INSTANCE.wrapStringToWidthAsList(textRenderer, i18n.translateKey("modmenu.links"), getRowWidth())) {
@@ -217,7 +217,7 @@ public class DescriptionListWidget extends EntryListWidget<DescriptionListWidget
 				});
 			}
 
-			if (!licenses.isEmpty() && !config.getHideModLicense()) {
+			if (!licenses.isEmpty() && !ModMenuConfig.HIDE_MOD_LICENSE.getValue()) {
 				if (!children().isEmpty()) children().add(new DescriptionEntry(""));
 				children().add(new DescriptionEntry(i18n.translateKey("modmenu.license")));
 				for (String license : licenses) {
@@ -225,7 +225,7 @@ public class DescriptionListWidget extends EntryListWidget<DescriptionListWidget
 				}
 			}
 
-			if ("minecraft".equals(id) && !config.getHideModCredits()) {
+			if ("minecraft".equals(id) && !ModMenuConfig.HIDE_MOD_CREDITS.getValue()) {
 				if (!children().isEmpty()) children().add(new DescriptionEntry(""));
 				String viewCreditsText = i18n.translateKey("modmenu.viewCredits");
 				for (String line : RenderUtils.INSTANCE.wrapStringToWidthAsList(textRenderer, viewCreditsText, getRowWidth() - 16)) {
@@ -233,7 +233,7 @@ public class DescriptionListWidget extends EntryListWidget<DescriptionListWidget
 				}
 			}
 
-			if ((!authors.isEmpty() || !contributors.isEmpty()) && !config.getHideModCredits()) {
+			if ((!authors.isEmpty() || !contributors.isEmpty()) && !ModMenuConfig.HIDE_MOD_CREDITS.getValue()) {
 				if (!children().isEmpty()) children().add(new DescriptionEntry(""));
 
 				children().add(new DescriptionEntry(i18n.translateKey("modmenu.credits")));

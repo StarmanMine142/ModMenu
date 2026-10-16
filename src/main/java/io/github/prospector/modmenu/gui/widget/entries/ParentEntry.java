@@ -1,10 +1,8 @@
-package io.github.prospector.modmenu.gui.entries;
+package io.github.prospector.modmenu.gui.widget.entries;
 
 import io.github.prospector.modmenu.ModMenu;
 import io.github.prospector.modmenu.config.ModMenuConfig;
-import io.github.prospector.modmenu.config.ModMenuConfigManager;
-import io.github.prospector.modmenu.gui.ModListEntry;
-import io.github.prospector.modmenu.gui.ModListWidget;
+import io.github.prospector.modmenu.gui.widget.ModListWidget;
 import io.github.prospector.modmenu.util.ModListSearch;
 import net.fabricmc.loader.api.ModContainer;
 import net.minecraft.client.Minecraft;
@@ -24,7 +22,6 @@ public class ParentEntry extends ModListEntry {
 	protected ModListWidget list;
 	protected boolean hoveringIcon = false;
 	protected long sinceLastClick = 0;
-	ModMenuConfig config = ModMenuConfigManager.getConfig();
 
 	public ParentEntry(Minecraft mc, ModContainer parent, List<ModContainer> children, ModListWidget list) {
 		super(mc, parent, list);
@@ -46,7 +43,7 @@ public class ParentEntry extends ModListEntry {
 		if (childrenBadgeWidth < childrenWidth + 4) {
 			childrenBadgeWidth = childrenWidth + 4;
 		}
-		int iconSize = config.getCompactList() ? COMPACT_ICON_SIZE : FULL_ICON_SIZE;
+		int iconSize = ModMenuConfig.COMPACT_LIST.getValue() ? COMPACT_ICON_SIZE : FULL_ICON_SIZE;
 		int childrenBadgeX = x + iconSize - childrenBadgeWidth;
 		int childrenBadgeY = y + iconSize - childrenBadgeHeight;
 
@@ -75,7 +72,7 @@ public class ParentEntry extends ModListEntry {
 
 			int xOffset = list.getParent().showModChildren.contains(getMetadata().getId()) ? iconSize : 0;
 			int yOffset = hoveringIcon ? iconSize : 0;
-			float maxUV = config.getCompactList() ? (int) (256 / (FULL_ICON_SIZE / (double) COMPACT_ICON_SIZE)) : 256;
+			float maxUV = ModMenuConfig.COMPACT_LIST.getValue() ? (int) (256 / (FULL_ICON_SIZE / (double) COMPACT_ICON_SIZE)) : 256;
 
 			this.client.textureManager.loadTexture(PARENT_MOD_TEXTURE).bind();
 			TessellatorGeneral t = GLRenderer.getTessellator();
@@ -92,12 +89,12 @@ public class ParentEntry extends ModListEntry {
 
 	@Override
 	public void mouseClicked(int mouseX, int mouseY, int i) {
-		int iconSize = config.getCompactList() ? COMPACT_ICON_SIZE : FULL_ICON_SIZE;
+		int iconSize = ModMenuConfig.COMPACT_LIST.getValue() ? COMPACT_ICON_SIZE : FULL_ICON_SIZE;
 		int iconLeft = list.getRowLeft() + getXOffset();
 		if (mouseX >= iconLeft && mouseX < iconLeft + iconSize) {
 			toggleChildren();
 			return;
-		} else if (!config.getQuickConfigure() && System.currentTimeMillis() - sinceLastClick < 250) {
+		} else if (!ModMenuConfig.QUICK_CONFIGURE.getValue() && System.currentTimeMillis() - sinceLastClick < 250) {
 			toggleChildren();
 			return;
 		}

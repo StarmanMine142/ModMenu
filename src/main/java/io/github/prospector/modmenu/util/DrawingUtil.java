@@ -1,6 +1,6 @@
 package io.github.prospector.modmenu.util;
 
-import io.github.prospector.modmenu.config.ModMenuConfigManager;
+import io.github.prospector.modmenu.config.ModMenuConfig;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.loader.api.ModContainer;
@@ -22,7 +22,7 @@ public class DrawingUtil {
 
         Random random = new Random(seed);
         int color = 0xFF000000 | Color.HSBtoRGB(random.nextFloat(), random.nextFloat() * 0.1f + 0.7f, 0.9f);
-        if (!ModMenuConfigManager.getConfig().getRandomJavaColors()) {
+        if (!ModMenuConfig.RANDOM_JAVA_COLORS.getValue()) {
             color = 0xFFDD5656;
         }
 

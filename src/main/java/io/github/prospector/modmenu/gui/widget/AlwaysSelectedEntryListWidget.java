@@ -1,5 +1,6 @@
-package io.github.prospector.modmenu.gui;
+package io.github.prospector.modmenu.gui.widget;
 
+import io.github.prospector.modmenu.gui.widget.entries.EntryListWidget;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;

@@ -2,10 +2,9 @@ package io.github.prospector.modmenu.mixin;
 
 import io.github.prospector.modmenu.ModMenu;
 import io.github.prospector.modmenu.config.ModMenuConfig;
-import io.github.prospector.modmenu.config.ModMenuConfigManager;
-import io.github.prospector.modmenu.gui.ModListScreen;
-import io.github.prospector.modmenu.gui.ModMenuButtonWidget;
-import io.github.prospector.modmenu.gui.ModMenuTexturedButtonWidget;
+import io.github.prospector.modmenu.gui.ModsScreen;
+import io.github.prospector.modmenu.gui.widget.ModMenuButtonWidget;
+import io.github.prospector.modmenu.gui.widget.SmallModMenuButtonWidget;
 import net.minecraft.client.gui.ButtonElement;
 import net.minecraft.client.gui.Screen;
 import net.minecraft.client.gui.ScreenPause;
@@ -18,12 +17,12 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class ScreenPauseMixin extends Screen {
 	@Inject(at = @At("RETURN"), method = "init")
 	public void modmenu$drawMenuButton(CallbackInfo info) {
-		if (ModMenuConfigManager.getConfig().getGameMenuButtonStyle() == ModMenuConfig.GameMenuButtonStyle.INSERT) {
+		if (ModMenuConfig.GAME_MENU_BUTTON_STYLE.getValue() == ModMenuConfig.GameMenuButtonStyle.INSERT) {
 			String buttonText = ModMenu.createModsButtonText(false);
 			this.buttons.add(new ModMenuButtonWidget(1000, this.width / 2 - 100, this.height / 4 + 72 - 16, 200, 20, buttonText));
 		} else {
 			this.buttons.removeIf(b -> b.id == 10);
-			this.buttons.add(new ModMenuTexturedButtonWidget(
+			this.buttons.add(new SmallModMenuButtonWidget(
 					1000, this.width / 2 - 124, this.height / 4 + 104, 20, 20, 0, 0,
 					"/assets/" + ModMenu.MOD_ID + "/textures/gui/open_button.png", 32, 64
 			) {});
@@ -33,7 +32,7 @@ public class ScreenPauseMixin extends Screen {
 	@Inject(method = "buttonClicked", at = @At("HEAD"))
 	private void modmenu$onActionPerformed(ButtonElement button, CallbackInfo ci) {
 		if (button.id == 1000) {
-			this.mc.displayScreen(new ModListScreen(this));
+			this.mc.displayScreen(new ModsScreen(this));
 		}
 	}
 }

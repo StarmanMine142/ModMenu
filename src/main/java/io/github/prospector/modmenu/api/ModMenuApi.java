@@ -1,7 +1,7 @@
 package io.github.prospector.modmenu.api;
 
 import io.github.prospector.modmenu.ModMenu;
-import io.github.prospector.modmenu.gui.ModListScreen;
+import io.github.prospector.modmenu.gui.ModsScreen;
 import io.github.prospector.modmenu.util.NullScreenFactory;
 import io.github.prospector.modmenu.util.TriConsumer;
 import net.minecraft.client.gui.Screen;
@@ -18,7 +18,7 @@ public interface ModMenuApi {
 	 * @return A "Mods" Screen
 	 */
 	static Screen createModsScreen(Screen previous) {
-		return new ModListScreen(previous);
+		return new ModsScreen(previous);
 	}
 
 	/**

@@ -2,8 +2,7 @@ package io.github.prospector.modmenu.util;
 
 import io.github.prospector.modmenu.ModMenu;
 import io.github.prospector.modmenu.config.ModMenuConfig;
-import io.github.prospector.modmenu.config.ModMenuConfigManager;
-import io.github.prospector.modmenu.gui.ModListScreen;
+import io.github.prospector.modmenu.gui.ModsScreen;
 import net.fabricmc.loader.api.ModContainer;
 import net.fabricmc.loader.api.metadata.ModMetadata;
 import net.fabricmc.loader.api.metadata.Person;
@@ -20,7 +19,7 @@ public final class ModListSearch {
 		return query != null && !query.isEmpty();
 	}
 
-	public static List<ModContainer> search(ModListScreen screen, String query, List<ModContainer> candidates) {
+	public static List<ModContainer> search(ModsScreen screen, String query, List<ModContainer> candidates) {
 		if (!validSearchQuery(query)) {
 			return candidates;
 		}
@@ -29,23 +28,22 @@ public final class ModListSearch {
 				.collect(Collectors.toList());
 	}
 
-	private static boolean passesFilters(ModListScreen screen, ModContainer container, String query) {
+	private static boolean passesFilters(ModsScreen screen, ModContainer container, String query) {
 		ModMetadata metadata = container.getMetadata();
 		String id = metadata.getId();
 		I18n i18n = I18n.getInstance();
-		ModMenuConfig config = ModMenuConfigManager.getConfig();
 
 		String nameTranslation = "modmenu.nameTranslation." + id;
 		String translatedName = i18n.translateKey(nameTranslation);
-		String modName = !translatedName.equals(nameTranslation) && config.getTranslateNames() ? translatedName : metadata.getName();
+		String modName = !translatedName.equals(nameTranslation) && ModMenuConfig.TRANSLATE_NAMES.getValue() ? translatedName : metadata.getName();
 
 		String descriptionTranslation = "modmenu.descriptionTranslation." + id;
 		String translatedDescription = i18n.translateKey(descriptionTranslation);
-		String modDescription = !translatedDescription.equals(descriptionTranslation) && config.getTranslateDescriptions() ? translatedDescription : metadata.getDescription();
+		String modDescription = !translatedDescription.equals(descriptionTranslation) && ModMenuConfig.TRANSLATE_DESCRIPTIONS.getValue() ? translatedDescription : metadata.getDescription();
 
 		String summaryTranslation = "modmenu.summaryTranslation." + id;
 		String translatedSummary = i18n.translateKey(summaryTranslation);
-		String modSummary = !translatedSummary.equals(summaryTranslation) && config.getTranslateDescriptions() ? translatedSummary : metadata.getDescription();
+		String modSummary = !translatedSummary.equals(summaryTranslation) && ModMenuConfig.TRANSLATE_DESCRIPTIONS.getValue() ? translatedSummary : metadata.getDescription();
 
 		if (modName.toLowerCase(Locale.ROOT).contains(query) // Search mod name
 				|| modDescription.toLowerCase(Locale.ROOT).contains(query) // Search mod description

@@ -1,18 +1,18 @@
-package io.github.prospector.modmenu.gui;
+package io.github.prospector.modmenu.gui.widget;
 
 import io.github.prospector.modmenu.ModMenu;
 import io.github.prospector.modmenu.config.ModMenuConfig;
-import io.github.prospector.modmenu.config.ModMenuConfigManager;
-import io.github.prospector.modmenu.gui.entries.ChildEntry;
-import io.github.prospector.modmenu.gui.entries.IndependentEntry;
-import io.github.prospector.modmenu.gui.entries.ParentEntry;
+import io.github.prospector.modmenu.gui.widget.entries.ModListEntry;
+import io.github.prospector.modmenu.gui.ModsScreen;
+import io.github.prospector.modmenu.gui.widget.entries.ChildEntry;
+import io.github.prospector.modmenu.gui.widget.entries.IndependentEntry;
+import io.github.prospector.modmenu.gui.widget.entries.ParentEntry;
 import io.github.prospector.modmenu.util.ModListSearch;
 import io.github.prospector.modmenu.util.TestModContainer;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
 import net.fabricmc.loader.api.metadata.ModMetadata;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Screen;
 import net.minecraft.client.render.renderer.GLRenderer;
 import net.minecraft.client.render.renderer.Shaders;
 import net.minecraft.client.render.tessellator.TessellatorGeneral;
@@ -26,7 +26,7 @@ public class ModListWidget extends AlwaysSelectedEntryListWidget<ModListEntry> i
 	public static final boolean DEBUG = Boolean.getBoolean("modmenu.debug");
 
 	private final Map<Path, BufferedImage> modIconsCache = new HashMap<>();
-	private final ModListScreen parent;
+	private final ModsScreen parent;
 	private List<ModContainer> modContainerList = null;
 	private Set<ModContainer> addedMods = new HashSet<>();
 	private String selectedModId = null;
@@ -35,9 +35,7 @@ public class ModListWidget extends AlwaysSelectedEntryListWidget<ModListEntry> i
 	private double scrollBarGrabbedY = 0;
 	private double scrollBarGrabOffset = 0;
 
-	ModMenuConfig config = ModMenuConfigManager.getConfig();
-
-	public ModListWidget(Minecraft client, int width, int height, int y1, int y2, int entryHeight, String searchTerm, ModListWidget list, ModListScreen parent) {
+	public ModListWidget(Minecraft client, int width, int height, int y1, int y2, int entryHeight, String searchTerm, ModListWidget list, ModsScreen parent) {
 		super(client, width, height, y1, y2, entryHeight);
 		this.parent = parent;
 		if (list != null) {
@@ -77,10 +75,10 @@ public class ModListWidget extends AlwaysSelectedEntryListWidget<ModListEntry> i
 
 	@Override
 	public int addEntry(ModListEntry entry) {
-		if (addedMods.contains(entry.container)) {
+		if (addedMods.contains(entry.getContainer())) {
 			return 0;
 		}
-		addedMods.add(entry.container);
+		addedMods.add(entry.getContainer());
 		int i = super.addEntry(entry);
 		if (entry.getMetadata().getId().equals(selectedModId)) {
 			setSelected(entry);
@@ -90,13 +88,13 @@ public class ModListWidget extends AlwaysSelectedEntryListWidget<ModListEntry> i
 
 	@Override
 	protected boolean removeEntry(ModListEntry entry) {
-		addedMods.remove(entry.container);
+		addedMods.remove(entry.getContainer());
 		return super.removeEntry(entry);
 	}
 
 	@Override
 	protected ModListEntry remove(int index) {
-		addedMods.remove(getEntry(index).container);
+		addedMods.remove(getEntry(index).getContainer());
 		return super.remove(index);
 	}
 
@@ -138,7 +136,7 @@ public class ModListWidget extends AlwaysSelectedEntryListWidget<ModListEntry> i
 		if (children == null) return false;
 		return !children.stream().allMatch(child -> {
 			String childId = child.getMetadata().getId();
-			return ModMenu.LIBRARY_MODS.contains(childId) && !config.getShowLibraries();
+			return ModMenu.LIBRARY_MODS.contains(childId) && !ModMenuConfig.SHOW_LIBRARIES.getValue().isTrue();
 		});
 	}
 
@@ -155,7 +153,7 @@ public class ModListWidget extends AlwaysSelectedEntryListWidget<ModListEntry> i
 		if (this.modContainerList == null || refresh) {
 			this.modContainerList = new ArrayList<>();
 			modContainerList.addAll(mods);
-			this.modContainerList.sort(config.getSorting().getComparator());
+			this.modContainerList.sort(ModMenuConfig.SORTING.getValue().getComparator());
 		}
 
 		List<ModContainer> matched = ModListSearch.search(parent, searchTerm, modContainerList);
@@ -166,7 +164,7 @@ public class ModListWidget extends AlwaysSelectedEntryListWidget<ModListEntry> i
 			boolean library = ModMenu.LIBRARY_MODS.contains(id);
 
 			//Hide parent lib mods when the config is set to hide
-			if (library && !config.getShowLibraries()) {
+			if (library && !ModMenuConfig.SHOW_LIBRARIES.getValue().isTrue()) {
 				continue;
 			}
 
@@ -174,17 +172,13 @@ public class ModListWidget extends AlwaysSelectedEntryListWidget<ModListEntry> i
 				if (isParent(id) && hasVisibleChildMods(container)) {
 					//Add parent mods when not searching
 					List<ModContainer> children = getChildrenFor(id);
-					children.sort(config.getSorting().getComparator());
+					children.sort(ModMenuConfig.SORTING.getValue().getComparator());
 					ParentEntry parent = new ParentEntry(minecraft, container, children, this);
 					this.addEntry(parent);
 					//Add children if they are meant to be shown
 					if (this.parent.showModChildren.contains(id)) {
 						List<ModContainer> validChildren = ModListSearch.search(this.parent, searchTerm, children);
 						for (ModContainer child : validChildren) {
-							String childId = child.getMetadata().getId();
-							if (ModMenu.LIBRARY_MODS.contains(childId) && !config.getShowLibraries()) {
-								continue;
-							}
 							this.addEntry(new ChildEntry(minecraft, child, parent, this, validChildren.indexOf(child) == validChildren.size() - 1));
 						}
 					}
@@ -266,7 +260,7 @@ public class ModListWidget extends AlwaysSelectedEntryListWidget<ModListEntry> i
 		if (this.isMouseOver(mouseX, mouseY)) {
 			ModListEntry entry = this.getEntryAtPos(mouseX, mouseY);
 			if (entry != null) {
-				if (entry.list.getFocused() == null || !entry.list.getFocused().equals(entry)) {
+				if (entry.getList().getFocused() == null || !entry.getList().getFocused().equals(entry)) {
 					this.setFocused(entry);
 					this.setSelected(entry);
 					this.setDragging(true);
@@ -395,7 +389,7 @@ public class ModListWidget extends AlwaysSelectedEntryListWidget<ModListEntry> i
 		return this.top;
 	}
 
-	public ModListScreen getParent() {
+	public ModsScreen getParent() {
 		return parent;
 	}
 
@@ -413,11 +407,11 @@ public class ModListWidget extends AlwaysSelectedEntryListWidget<ModListEntry> i
 		this.children().forEach(ModListEntry::deleteTexture);
 	}
 
-	BufferedImage getCachedModIcon(Path path) {
+	public BufferedImage getCachedModIcon(Path path) {
 		return this.modIconsCache.get(path);
 	}
 
-	void cacheModIcon(Path path, BufferedImage tex) {
+	public void cacheModIcon(Path path, BufferedImage tex) {
 		this.modIconsCache.put(path, tex);
 	}
 

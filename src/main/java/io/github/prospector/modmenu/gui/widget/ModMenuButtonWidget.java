@@ -1,7 +1,7 @@
-package io.github.prospector.modmenu.gui;
+package io.github.prospector.modmenu.gui.widget;
 
 import io.github.prospector.modmenu.ModMenu;
-import io.github.prospector.modmenu.config.ModMenuConfigManager;
+import io.github.prospector.modmenu.config.ModMenuConfig;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ButtonElement;
 
@@ -13,7 +13,7 @@ public class ModMenuButtonWidget extends ButtonElement {
 	@Override
 	public void drawButton(Minecraft minecraft, int mouseX, int mouseY) {
 		super.drawButton(minecraft, mouseX, mouseY);
-		if (ModMenuConfigManager.getConfig().getButtonUpdateBadge() && ModMenu.areModUpdatesAvailable()) {
+		if (ModMenuConfig.BUTTON_UPDATE_BADGE.getValue() && ModMenu.areModUpdatesAvailable()) {
 			UpdateAvailableBadge.renderBadge(
 					this.xPosition + this.width - 13,
 					this.yPosition + (this.height / 2) - 4

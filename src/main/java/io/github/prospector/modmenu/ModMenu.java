@@ -51,7 +51,7 @@ public class ModMenu implements ClientModInitializer {
 
 	private static int cachedDisplayedModCount = -1;
 
-	public static void invalidateCache() {
+	public static void clearModCountCache() {
 		cachedDisplayedModCount = -1;
 	}
 
@@ -71,10 +71,9 @@ public class ModMenu implements ClientModInitializer {
 
 	public static String getDisplayedModCount() {
 		if (cachedDisplayedModCount == -1) {
-			ModMenuConfig config = ModMenuConfigManager.getConfig();
-			boolean includeChildren = config.getCountChildren();
-			boolean includeLibraries = config.getCountLibraries();
-			boolean includeHidden = config.getCountHiddenMods();
+			boolean includeChildren = ModMenuConfig.COUNT_CHILDREN.getValue();
+			boolean includeLibraries = ModMenuConfig.COUNT_LIBRARIES.getValue();
+			boolean includeHidden = ModMenuConfig.COUNT_HIDDEN_MODS.getValue();
 
 			long count = MODS.values().stream().filter(mod -> {
 				boolean isChild = mod.getParent() != null;
@@ -100,22 +99,21 @@ public class ModMenu implements ClientModInitializer {
 	}
 
 	public static String createModsButtonText(boolean title) {
-		ModMenuConfig config = ModMenuConfigManager.getConfig();
-		var titleStyle = config.getModsButtonStyle();
-		var gameMenuStyle = config.getGameMenuButtonStyle();
+		var titleStyle = ModMenuConfig.MODS_BUTTON_STYLE.getValue();
+		var gameMenuStyle = ModMenuConfig.GAME_MENU_BUTTON_STYLE.getValue();
 
 		boolean isIcon = title ?
-				titleStyle == ModMenuConfig.ModsButtonStyle.ICON :
+				titleStyle == ModMenuConfig.TitleMenuButtonStyle.ICON :
 				gameMenuStyle == ModMenuConfig.GameMenuButtonStyle.ICON;
 
 		boolean isShort = title ?
-				titleStyle == ModMenuConfig.ModsButtonStyle.INSERT :
+				titleStyle == ModMenuConfig.TitleMenuButtonStyle.INSERT :
 				gameMenuStyle == ModMenuConfig.GameMenuButtonStyle.INSERT;
 
 		I18n i18n = I18n.getInstance();
 		String modsText = i18n.translateKey("modmenu.title");
 
-		if (config.getModCountLocation().isOnModsButton() && !isIcon) {
+		if (ModMenuConfig.MOD_COUNT_LOCATION.getValue().isOnModsButton() && !isIcon) {
 			String count = getDisplayedModCount();
 			if (!isShort) {
 				modsText += " " + i18n.translateKeyAndFormat("modmenu.loaded", count);
@@ -128,7 +126,7 @@ public class ModMenu implements ClientModInitializer {
 				key = hasSpecific ? specificKey : "modmenu.loaded";
 
 				String secretKey = specificKey + ".secret";
-				if (config.getEasterEggs() && !i18n.translateKey(secretKey).equals(secretKey)) {
+				if (ModMenuConfig.EASTER_EGGS.getValue() && !i18n.translateKey(secretKey).equals(secretKey)) {
 					key = secretKey;
 				}
 				modsText += " " + i18n.translateKeyAndFormat(key, count);

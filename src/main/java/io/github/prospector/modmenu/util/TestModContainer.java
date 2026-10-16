@@ -1,9 +1,6 @@
 package io.github.prospector.modmenu.util;
 
-import net.fabricmc.loader.api.FabricLoader;
-import net.fabricmc.loader.api.ModContainer;
-import net.fabricmc.loader.api.SemanticVersion;
-import net.fabricmc.loader.api.Version;
+import net.fabricmc.loader.api.*;
 import net.fabricmc.loader.api.metadata.*;
 import net.fabricmc.loader.util.version.VersionParsingException;
 

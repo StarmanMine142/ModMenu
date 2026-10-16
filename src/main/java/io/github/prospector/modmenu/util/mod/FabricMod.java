@@ -2,7 +2,7 @@ package io.github.prospector.modmenu.util.mod;
 
 import io.github.prospector.modmenu.api.UpdateChecker;
 import io.github.prospector.modmenu.api.UpdateInfo;
-import io.github.prospector.modmenu.config.ModMenuConfigManager;
+import io.github.prospector.modmenu.config.ModMenuConfig;
 import io.github.prospector.modmenu.util.BadgeRenderer;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
@@ -51,7 +51,7 @@ public class FabricMod implements Mod {
 
     @Override
     public boolean isHidden() {
-        return ModMenuConfigManager.getConfig().getHiddenMods().contains(this.getId());
+        return ModMenuConfig.HIDDEN_MODS.getValue().contains(this.getId());
     }
 
     @Override
@@ -61,7 +61,7 @@ public class FabricMod implements Mod {
 
     @Override
     public boolean allowsUpdateChecks() {
-        if (ModMenuConfigManager.getConfig().getDisableUpdateChecker().contains(this.getId())) {
+        if (ModMenuConfig.DISABLE_UPDATE_CHECKER.getValue().contains(this.getId())) {
             return false;
         } else {
             return this.allowsUpdateChecks;

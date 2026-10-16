@@ -1,4 +1,4 @@
-package io.github.prospector.modmenu.gui;
+package io.github.prospector.modmenu.gui.widget.entries;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -271,7 +271,7 @@ public abstract class EntryListWidget<E extends EntryListWidget.Entry<E>> extend
 		this.setScrollAmount(this.children().indexOf(entry) * this.itemHeight + this.itemHeight / 2 - (this.bottom - this.top) / 2);
 	}
 
-	protected void ensureVisible(E entry) {
+	public void ensureVisible(E entry) {
 		int i = this.getRowTop(this.children().indexOf(entry));
 		int j = i - this.top - 4 - this.itemHeight;
 		if (j < 0) {
@@ -302,7 +302,7 @@ public abstract class EntryListWidget<E extends EntryListWidget.Entry<E>> extend
 		this.scrollAmount = d;
 	}
 
-	private int getMaxScroll() {
+	protected int getMaxScroll() {
 		return Math.max(0, this.getMaxPosition() - (this.bottom - this.top - 4));
 	}
 

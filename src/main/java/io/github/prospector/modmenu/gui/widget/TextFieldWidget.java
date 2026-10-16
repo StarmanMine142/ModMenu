@@ -1,4 +1,4 @@
-package io.github.prospector.modmenu.gui;
+package io.github.prospector.modmenu.gui.widget;
 
 import io.github.prospector.modmenu.mixin.MinecraftAccessor;
 import io.github.prospector.modmenu.mixin.TextFieldEditorAccessor;
@@ -431,9 +431,9 @@ public class TextFieldWidget extends Screen implements ITextField {
 			String s = trimStringToWidth(fontRenderer, text.substring(lineScrollOffset), getWidth());
 			setCursorPosition(trimStringToWidth(fontRenderer, s, i).length() + lineScrollOffset);
 			//return true;
-		} else {
-			//return false;
-		}
+		} /*else {
+			return false;
+		}*/
 	}
 
 	/**
@@ -749,5 +749,4 @@ public class TextFieldWidget extends Screen implements ITextField {
 			width += font.stringWidth(Character.toString(text.charAt(reverse ? text.length() - 1 - length : length)));
 		return reverse ? text.substring(text.length() - length) : text.substring(0, length);
 	}
-
 }

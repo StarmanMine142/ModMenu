@@ -1,7 +1,7 @@
-package io.github.prospector.modmenu.gui;
+package io.github.prospector.modmenu.gui.widget;
 
 import io.github.prospector.modmenu.ModMenu;
-import io.github.prospector.modmenu.config.ModMenuConfigManager;
+import io.github.prospector.modmenu.config.ModMenuConfig;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ButtonElement;
 import net.minecraft.client.render.font.FontRenderer;
@@ -10,22 +10,22 @@ import net.minecraft.client.render.renderer.Shaders;
 import net.minecraft.client.render.tessellator.TessellatorGeneral;
 import net.minecraft.client.render.window.CursorShape;
 
-public class ModMenuTexturedButtonWidget extends ButtonElement {
+public class SmallModMenuButtonWidget extends ButtonElement {
 	private final String texture;
 	private final int u;
 	private final int v;
 	private final int uWidth;
 	private final int vHeight;
 
-	protected ModMenuTexturedButtonWidget(int buttonId, int x, int y, int width, int height, int u, int v, String texture) {
+	protected SmallModMenuButtonWidget(int buttonId, int x, int y, int width, int height, int u, int v, String texture) {
 		this(buttonId, x, y, width, height, u, v, texture, 256, 256);
 	}
 
-	protected ModMenuTexturedButtonWidget(int buttonId, int x, int y, int width, int height, int u, int v, String texture, int uWidth, int vHeight) {
+	protected SmallModMenuButtonWidget(int buttonId, int x, int y, int width, int height, int u, int v, String texture, int uWidth, int vHeight) {
 		this(buttonId, x, y, width, height, u, v, texture, uWidth, vHeight, "");
 	}
 
-	protected ModMenuTexturedButtonWidget(int buttonId, int x, int y, int width, int height, int u, int v, String texture, int uWidth, int vHeight, String message) {
+	protected SmallModMenuButtonWidget(int buttonId, int x, int y, int width, int height, int u, int v, String texture, int uWidth, int vHeight, String message) {
 		super(buttonId, x, y, width, height, message);
 		this.uWidth = uWidth;
 		this.vHeight = vHeight;
@@ -83,7 +83,7 @@ public class ModMenuTexturedButtonWidget extends ButtonElement {
 			GLRenderer.popFrame();
 
 			if (this.id == 1000) {
-				if (ModMenuConfigManager.getConfig().getButtonUpdateBadge() && ModMenu.areModUpdatesAvailable()) {
+				if (ModMenuConfig.BUTTON_UPDATE_BADGE.getValue() && ModMenu.areModUpdatesAvailable()) {
 					UpdateAvailableBadge.renderBadge(
 							this.xPosition + this.width - 5,
 							this.yPosition - 3
