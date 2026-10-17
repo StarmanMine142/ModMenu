@@ -12,6 +12,7 @@ import net.minecraft.client.render.renderer.GLRenderer;
 import net.minecraft.client.render.renderer.Shaders;
 import net.minecraft.client.render.tessellator.TessellatorGeneral;
 import net.minecraft.core.lang.I18n;
+import net.minecraft.core.sound.SoundCategory;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
@@ -86,7 +87,7 @@ public class ModMenuOptionsScreen extends Screen {
         }
 
         int lastRow = (options.size() - 1) / columns;
-        contentHeight = startY + (lastRow + 1) * rowHeight + 6;
+        contentHeight = (startY - TOP) + lastRow * rowHeight + buttonHeight + 4;
 
         int doneY = this.height - 28;
         this.buttons.add(ButtonUtil.createButton(DONE_ID, this.width / 2 - 75, doneY, 150, 20, i18n.translateKey("gui.options.button.done")));
@@ -139,6 +140,8 @@ public class ModMenuOptionsScreen extends Screen {
 
     @Override
     protected void buttonClicked(ButtonElement button) {
+        this.mc.sndManager.playSound("random.click", SoundCategory.GUI_SOUNDS, 1.0F, 1.0F);
+        
         if (button.id == DONE_ID) {
             this.mc.displayScreen(this.parent);
             return;
