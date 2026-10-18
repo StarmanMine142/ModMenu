@@ -24,7 +24,6 @@ public class ModMenuOptionsScreen extends Screen {
     private final Screen parent;
     private final List<OptionConvertible> options = new ArrayList<>();
     private final List<ButtonElement> optionButtons = new ArrayList<>();
-    private int nextButtonId = 0;
     private static final int DONE_ID = 1000;
     private static final int TOP = 32;
     private static final int BOTTOM_MARGIN = 40;
@@ -44,10 +43,10 @@ public class ModMenuOptionsScreen extends Screen {
 
         this.buttons.clear();
         this.optionButtons.clear();
-        this.nextButtonId = 0;
         this.scrollPosition = 0.0F;
         this.scrolling = false;
 
+        int nextButtonId = 0;
         int buttonWidth = 150;
         int buttonHeight = 20;
         int gap = 4;
@@ -141,7 +140,7 @@ public class ModMenuOptionsScreen extends Screen {
     @Override
     protected void buttonClicked(ButtonElement button) {
         this.mc.sndManager.playSound("random.click", SoundCategory.GUI_SOUNDS, 1.0F, 1.0F);
-        
+
         if (button.id == DONE_ID) {
             this.mc.displayScreen(this.parent);
             return;

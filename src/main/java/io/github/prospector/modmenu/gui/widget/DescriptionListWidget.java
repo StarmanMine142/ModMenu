@@ -47,7 +47,7 @@ public class DescriptionListWidget extends EntryListWidget<DescriptionListWidget
 		return this.width - 6 + left;
 	}
 
-	protected class LinkEntry extends DescriptionEntry {
+	protected static class LinkEntry extends DescriptionEntry {
 		private final String link;
 		private final int indent;
 		private int lastRenderX;
@@ -78,7 +78,7 @@ public class DescriptionListWidget extends EntryListWidget<DescriptionListWidget
 		}
 	}
 
-	protected class BTACreditsEntry extends DescriptionEntry {
+	protected static class BTACreditsEntry extends DescriptionEntry {
 		private final int indent;
 		private int lastRenderX;
 		private int lastRenderY;

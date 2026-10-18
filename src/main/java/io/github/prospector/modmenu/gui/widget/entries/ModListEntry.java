@@ -31,10 +31,13 @@ import java.awt.image.BufferedImage;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 public class ModListEntry extends AlwaysSelectedEntryListWidget.Entry<ModListEntry> {
 	private static final Logger LOGGER = LoggerFactory.getLogger(ModMenu.MOD_ID);
+	public static final String UNKNOWN_ICON = "/assets/" + ModMenu.MOD_ID + "/unknown_icon.png";
 
 	protected final Minecraft client;
 	protected final ModContainer container;
@@ -189,19 +192,26 @@ public class ModListEntry extends AlwaysSelectedEntryListWidget.Entry<ModListEnt
 				int textY = y + lineHeight + 2;
 				int maxWidth = rowWidth - iconSize - 7;
 				int maxLines = 2;
-				int currentLine = 0;
 
+				List<String> allLines = new ArrayList<>();
 				String[] paragraphs = description.split("\r?\n");
-
 				for (String paragraph : paragraphs) {
-					if (currentLine >= maxLines) break;
+					allLines.addAll(RenderUtils.INSTANCE.wrapStringToWidthAsList(font, paragraph, maxWidth));
+				}
 
-					for (String line : RenderUtils.INSTANCE.wrapStringToWidthAsList(font, paragraph, maxWidth)) {
-						if (currentLine >= maxLines) break;
-
-						this.drawStringNoShadow(font, line, textX, textY + (currentLine * lineHeight), 0x808080);
-						currentLine++;
+				if (allLines.size() > maxLines) {
+					allLines = new ArrayList<>(allLines.subList(0, maxLines));
+					String last = allLines.get(maxLines - 1);
+					String ellipsis = "...";
+					int ellipsisWidth = font.stringWidth(ellipsis);
+					while (!last.isEmpty() && font.stringWidth(last) + ellipsisWidth > maxWidth) {
+						last = last.substring(0, last.length() - 1);
 					}
+					allLines.set(maxLines - 1, last + ellipsis);
+				}
+
+				for (int i = 0; i < allLines.size(); i++) {
+					this.drawStringNoShadow(font, allLines.get(i), textX, textY + (i * lineHeight), 0x808080);
 				}
 			}
 		}
@@ -240,7 +250,7 @@ public class ModListEntry extends AlwaysSelectedEntryListWidget.Entry<ModListEnt
 				} else if (metadata.getId().equals("java")) {
 					icon = "assets/" + ModMenu.MOD_ID + "/java_icon.png";
 				} else {
-					icon = "assets/" + ModMenu.MOD_ID + "/unknown_icon.png";
+					icon = UNKNOWN_ICON;
 				}
 				path = modMenu.findPath(icon).orElse(null);
 			}
@@ -295,7 +305,7 @@ public class ModListEntry extends AlwaysSelectedEntryListWidget.Entry<ModListEnt
 			if (icon != null) {
 				this.iconLocation = this.client.textureManager.loadBufferedTexture(icon).id();
 			} else {
-				this.iconLocation = this.client.textureManager.loadTexture("/assets/modmenu/unknown_icon.png").id();
+				this.iconLocation = this.client.textureManager.loadTexture(UNKNOWN_ICON).id();
 			}
 		}
 		this.client.textureManager.bindTexture(this.iconLocation);

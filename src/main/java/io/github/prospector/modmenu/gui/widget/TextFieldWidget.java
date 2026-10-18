@@ -69,7 +69,7 @@ public class TextFieldWidget extends Screen implements ITextField {
 
 	private final @Nullable String emptyText;
 
-	public TextFieldWidget(int x, int y, int width, int height, String emptyText) {
+	public TextFieldWidget(int x, int y, int width, int height, @Nullable String emptyText) {
 		this.x = x;
 		this.y = y;
 		this.width = width;
